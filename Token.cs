@@ -4,10 +4,10 @@ namespace LoxInterpreter
 {
     public class Token
     {
-        TokenType type;
-        string lexeme;
-        Object literal;
-        int line; // [location]
+        public TokenType type;
+        public string lexeme;
+        public Object literal;
+        public int line; // [location]
 
         public Token(TokenType type, String lexeme, Object literal, int line)
         {
