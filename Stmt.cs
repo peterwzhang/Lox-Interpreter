@@ -24,9 +24,9 @@ namespace LoxInterpreter
     public class Block : Stmt<T>
     {
 
-      List<Stmt<T>> statements;
+      public List<Stmt<T>> statements;
 
-      Block(List<Stmt<T>> statements)
+      public Block(List<Stmt<T>> statements)
       {
         this.statements = statements;
       }
@@ -42,9 +42,9 @@ namespace LoxInterpreter
     public class Class : Stmt<T>
     {
 
-      Token name;
-      Expr<T>.Variable superclass;
-      List<Stmt<T>.Function> methods;
+      public Token name;
+      public Expr<T>.Variable superclass;
+      public List<Stmt<T>.Function> methods;
 
       public Class(Token name,
         Expr<T>.Variable superclass,
@@ -65,7 +65,7 @@ namespace LoxInterpreter
 //> stmt-expression
     public class Expression : Stmt<T>
     {
-      Expression(Expr<T> expression)
+      public Expression(Expr<T> expression)
       {
         this.expression = expression;
       }
@@ -75,14 +75,14 @@ namespace LoxInterpreter
         return visitor.VisitExpressionStmt(this);
       }
 
-      Expr<T> expression;
+      public Expr<T> expression;
     }
 
 //< stmt-expression
 //> stmt-function
     public class Function : Stmt<T>
     {
-      Function(Token name, List<Token> parms, List<Stmt<T>> body)
+      public Function(Token name, List<Token> parms, List<Stmt<T>> body)
       {
         this.name = name;
         this.parms = parms;
@@ -95,16 +95,16 @@ namespace LoxInterpreter
         return visitor.VisitFunctionStmt(this);
       }
 
-      Token name;
-      List<Token> parms;
-      List<Stmt<T>> body;
+      public Token name;
+      public List<Token> parms;
+      public List<Stmt<T>> body;
     }
 
 //< stmt-function
 //> stmt-if
     public class If : Stmt<T>
     {
-      If(Expr<T> condition, Stmt<T> thenBranch, Stmt<T> elseBranch)
+      public If(Expr<T> condition, Stmt<T> thenBranch, Stmt<T> elseBranch)
       {
         this.condition = condition;
         this.thenBranch = thenBranch;
@@ -117,16 +117,16 @@ namespace LoxInterpreter
         return visitor.VisitIfStmt(this);
       }
 
-      Expr<T> condition;
-      Stmt<T> thenBranch;
-      Stmt<T> elseBranch;
+      public Expr<T> condition;
+      public Stmt<T> thenBranch;
+      public Stmt<T> elseBranch;
     }
 
 //< stmt-if
 //> stmt-print
     public class Print : Stmt<T>
     {
-      Print(Expr<T> expression)
+      public Print(Expr<T> expression)
       {
         this.expression = expression;
       }
@@ -144,7 +144,7 @@ namespace LoxInterpreter
 //> stmt-return
     public class Return : Stmt<T>
     {
-      Return(Token keyword, Expr<T> value)
+      public Return(Token keyword, Expr<T> value)
       {
         this.keyword = keyword;
         this.value = value;
@@ -156,15 +156,15 @@ namespace LoxInterpreter
         return visitor.VisitReturnStmt(this);
       }
 
-      Token keyword;
-      Expr<T> value;
+      public Token keyword;
+      public Expr<T> value;
     }
 
 //< stmt-return
 //> stmt-var
     public class Var : Stmt<T>
     {
-      Var(Token name, Expr<T> initializer)
+      public Var(Token name, Expr<T> initializer)
       {
         this.name = name;
         this.initializer = initializer;
@@ -176,15 +176,15 @@ namespace LoxInterpreter
         return visitor.VisitVarStmt(this);
       }
 
-      Token name;
-      Expr<T> initializer;
+      public Token name;
+      public Expr<T> initializer;
     }
 
 //< stmt-var
 //> stmt-while
     public class While : Stmt<T>
     {
-      While(Expr<T> condition, Stmt<T> body)
+      public While(Expr<T> condition, Stmt<T> body)
       {
         this.condition = condition;
         this.body = body;
@@ -196,8 +196,8 @@ namespace LoxInterpreter
         return visitor.VisitWhileStmt(this);
       }
 
-      Expr<T> condition;
-      Stmt<T> body;
+      public Expr<T> condition;
+      public Stmt<T> body;
     }
 //< stmt-while
 
