@@ -39,8 +39,12 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Clock.cs" />
+        <Compile Include="Environment.cs" />
         <Compile Include="Expr.cs" />
         <Compile Include="Interpreter.cs" />
+        <Compile Include="LoxCallable.cs" />
+        <Compile Include="LoxFunction.cs" />
         <Compile Include="LoxInterpreter.cs" />
         <Compile Include="Parser.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

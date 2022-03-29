@@ -4,7 +4,7 @@ using LoxInterpreter.Properties;
 
 namespace LoxInterpreter
 {
-  abstract public class Stmt<T>
+  public abstract class Stmt<T>
   {
     public interface IVisitor
     {
@@ -31,7 +31,7 @@ namespace LoxInterpreter
         this.statements = statements;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitBlockStmt(this);
       }
@@ -55,7 +55,7 @@ namespace LoxInterpreter
         this.methods = methods;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitClassStmt(this);
       }
@@ -70,7 +70,7 @@ namespace LoxInterpreter
         this.expression = expression;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitExpressionStmt(this);
       }
@@ -90,7 +90,7 @@ namespace LoxInterpreter
       }
 
       public override
-        T accept(IVisitor visitor)
+        T Accept(IVisitor visitor)
       {
         return visitor.VisitFunctionStmt(this);
       }
@@ -112,7 +112,7 @@ namespace LoxInterpreter
       }
 
       public override
-        T accept(IVisitor visitor)
+        T Accept(IVisitor visitor)
       {
         return visitor.VisitIfStmt(this);
       }
@@ -132,7 +132,7 @@ namespace LoxInterpreter
       }
 
       public override
-        T accept(IVisitor visitor)
+        T Accept(IVisitor visitor)
       {
         return visitor.VisitPrintStmt(this);
       }
@@ -151,7 +151,7 @@ namespace LoxInterpreter
       }
 
       public override
-        T accept(IVisitor visitor)
+        T Accept(IVisitor visitor)
       {
         return visitor.VisitReturnStmt(this);
       }
@@ -171,7 +171,7 @@ namespace LoxInterpreter
       }
 
       public override
-        T accept(IVisitor visitor)
+        T Accept(IVisitor visitor)
       {
         return visitor.VisitVarStmt(this);
       }
@@ -191,7 +191,7 @@ namespace LoxInterpreter
       }
 
       public override
-        T accept(IVisitor visitor)
+        T Accept(IVisitor visitor)
       {
         return visitor.VisitWhileStmt(this);
       }
@@ -201,7 +201,7 @@ namespace LoxInterpreter
     }
 //< stmt-while
 
-    public abstract T accept(IVisitor visitor);
+    public abstract T Accept(IVisitor visitor);
   }
 }
 //< Appendix II stmt

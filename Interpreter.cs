@@ -1,58 +1,40 @@
 using System;
 using System.Collections.Generic;
+using LoxInterpreter;
 using LoxInterpreter.Properties;
+using Environment = System.Environment;
 
 namespace LoxInterpreter
 {
-  public class Interpreter : Expr<object>.IVisitor, Stmt.IVisitor<Void> {
+  public class Interpreter<T> : Expr<T>.IVisitor, Stmt<T>.IVisitor {
 //< Statements and State interpreter
 /* Statements and State environment-field < Functions global-environment
   private Environment environment = new Environment();
 */
 //> Functions global-environment
-      final Environment globals = new Environment();
+    static Environment globals = new Environment();
 
-    private Environment environment = globals;
+    Environment environment = globals;
 
 //< Functions global-environment
 //> Resolving and Binding locals-field
-    private final Map<Expr<Stmt<T>>, Integer> locals = new HashMap<>();
+    private Dictionary<Expr<Stmt<T>>, int> locals = new Dictionary<Expr<Stmt<T>>, int>();
 //< Resolving and Binding locals-field
 //> Statements and State environment-field
 
 //< Statements and State environment-field
 //> Functions interpreter-constructor
-    Interpreter()
+    public Interpreter()
     {
-      globals.define("clock", new LoxCallable()
-      {
-        @Override
-        public int arity() { return 0;
-      }
-
-      @Override
-
-      public Object call(Interpreter interpreter,
-        List<Object> arguments)
-      {
-        return (double) System.currentTimeMillis() / 1000.0;
-      }
-
-      @Override
-
-      public String toString()
-      {
-        return "<native fn>";
-      }
-
-      });
+      //TODO: instance of interface?
+      globals.Define("clock", new Clock<T>());
     }
 
 //< Functions interpreter-constructor
 /* Evaluating Expressions interpret < Statements and State interpret
   void interpret(Expr<Stmt<T>> expression) { // [void]
     try {
-      Object value = evaluate(expression);
+      object value = Evaluate(expression);
       System.out.println(stringify(value));
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
@@ -60,45 +42,49 @@ namespace LoxInterpreter
   }
 */
 //> Statements and State interpret
-    void interpret(List<Stmt> statements)
+    public void Interpret(List<Stmt<T>> statements)
     {
-      try
+      foreach (var statement in statements) 
       {
-        for (Stmt statement :
-        statements) {
-          execute(statement);
-        }
+        Execute(statement);
       }
-      catch (RuntimeError error)
-      {
-        Lox.runtimeError(error);
-      }
+      // try
+      // {
+      //   for (Stmt statement :
+      //   statements) {
+      //     Execute(statement);
+      //   }
+      // }
+      // catch (RuntimeError error)
+      // {
+      //   Lox.runtimeError(error);
+      // }
     }
 
 //< Statements and State interpret
-//> evaluate
-    private Object evaluate(Expr<Stmt<T>> expr)
+//> Evaluate
+    private object Evaluate(Expr<Stmt<T>> expr)
     {
-      return expr.accept(this);
+      return expr.Accept(this);
     }
 
-//< evaluate
-//> Statements and State execute
-    private void execute(Stmt stmt)
+//< Evaluate
+//> Statements and State Execute
+    private void Execute(Stmt<T> stmt)
     {
-      stmt.accept(this);
+      stmt.Accept(this);
     }
 
-//< Statements and State execute
+//< Statements and State Execute
 //> Resolving and Binding resolve
-    void resolve(Expr<Stmt<T>> expr, int depth)
+    public void Resolve(Expr<Stmt<T>> expr, int depth)
     {
-      locals.put(expr, depth);
+      locals.Add(expr, depth);
     }
 
 //< Resolving and Binding resolve
-//> Statements and State execute-block
-    void executeBlock(List<Stmt> statements,
+//> Statements and State Execute-block
+    public void ExecuteBlock(List<Stmt<T>> statements,
       Environment environment)
     {
       Environment previous = this.environment;
@@ -106,9 +92,9 @@ namespace LoxInterpreter
       {
         this.environment = environment;
 
-        for (Stmt statement :
-        statements) {
-          execute(statement);
+        foreach (var statement in statements) 
+        {
+          Execute(statement);
         }
       }
       finally
@@ -117,27 +103,25 @@ namespace LoxInterpreter
       }
     }
 
-//< Statements and State execute-block
-//> Statements and State visit-block
-    @Override
+//< Statements and State Execute-block
+//> Statements and State Visit-block
 
-    public Void visitBlockStmt(Stmt.Block stmt)
+    public void VisitBlockStmt(Stmt<T>.Block stmt)
     {
-      executeBlock(stmt.statements, new Environment(environment));
-      return null;
+      ExecuteBlock(stmt.statements, new Environment(environment));
     }
 
-//< Statements and State visit-block
-//> Classes interpreter-visit-class
-    @Override
+//< Statements and State Visit-block
+//> Classes interpreter-Visit-class
+    
 
-    public Void visitClassStmt(Stmt.Class stmt)
+    public void VisitClassStmt(Stmt<T>.Class stmt)
     {
 //> Inheritance interpret-superclass
-      Object superclass = null;
+      object superclass = null;
       if (stmt.superclass != null)
       {
-        superclass = evaluate(stmt.superclass);
+        superclass = Evaluate(stmt.superclass);
         if (!(superclass instanceof LoxClass)) {
           throw new RuntimeError(stmt.superclass.name,
             "Superclass must be a class.");
@@ -145,19 +129,19 @@ namespace LoxInterpreter
       }
 
 //< Inheritance interpret-superclass
-      environment.define(stmt.name.lexeme, null);
+      environment.Define(stmt.name.lexeme, null);
 //> Inheritance begin-superclass-environment
 
       if (stmt.superclass != null)
       {
         environment = new Environment(environment);
-        environment.define("super", superclass);
+        environment.Define("super", superclass);
       }
 //< Inheritance begin-superclass-environment
 //> interpret-methods
 
-      Map<String, LoxFunction> methods = new HashMap<>();
-      for (Stmt.Function method :
+      Map<string, LoxFunction> methods = new HashMap<>();
+      for (Stmt<T>.Function method :
       stmt.methods) {
 /* Classes interpret-methods < Classes interpreter-method-initializer
       LoxFunction function = new LoxFunction(method, environment);
@@ -185,122 +169,122 @@ namespace LoxInterpreter
 
 //< Inheritance interpreter-construct-class
 //< interpret-methods
-/* Classes interpreter-visit-class < Classes interpret-methods
+/* Classes interpreter-Visit-class < Classes interpret-methods
     LoxClass klass = new LoxClass(stmt.name.lexeme);
 */
       environment.assign(stmt.name, klass);
       return null;
     }
 
-//< Classes interpreter-visit-class
-//> Statements and State visit-expression-stmt
-    @Override
+//< Classes interpreter-Visit-class
+//> Statements and State Visit-expression-stmt
+    
 
-    public Void visitExpressionStmt(Stmt.Expression stmt)
+    public void VisitExpressionStmt(Stmt<T>.Expression stmt)
     {
-      evaluate(stmt.expression);
+      Evaluate(stmt.expression);
       return null;
     }
 
-//< Statements and State visit-expression-stmt
-//> Functions visit-function
-    @Override
+//< Statements and State Visit-expression-stmt
+//> Functions Visit-function
+    
 
-    public Void visitFunctionStmt(Stmt.Function stmt)
+    public void VisitFunctionStmt(Stmt<T>.Function stmt)
     {
-/* Functions visit-function < Functions visit-closure
+/* Functions Visit-function < Functions Visit-closure
     LoxFunction function = new LoxFunction(stmt);
 */
-/* Functions visit-closure < Classes construct-function
+/* Functions Visit-closure < Classes construct-function
     LoxFunction function = new LoxFunction(stmt, environment);
 */
 //> Classes construct-function
       LoxFunction function = new LoxFunction(stmt, environment,
         false);
 //< Classes construct-function
-      environment.define(stmt.name.lexeme, function);
+      environment.Define(stmt.name.lexeme, function);
       return null;
     }
 
-//< Functions visit-function
-//> Control Flow visit-if
-    @Override
+//< Functions Visit-function
+//> Control Flow Visit-if
+    
 
-    public Void visitIfStmt(Stmt.If stmt)
+    public void VisitIfStmt(Stmt<T>.If stmt)
     {
-      if (isTruthy(evaluate(stmt.condition)))
+      if (isTruthy(Evaluate(stmt.condition)))
       {
-        execute(stmt.thenBranch);
+        Execute(stmt.thenBranch);
       }
       else if (stmt.elseBranch != null)
       {
-        execute(stmt.elseBranch);
+        Execute(stmt.elseBranch);
       }
 
       return null;
     }
 
-//< Control Flow visit-if
-//> Statements and State visit-print
-    @Override
+//< Control Flow Visit-if
+//> Statements and State Visit-print
+    
 
-    public Void visitPrintStmt(Stmt.Print stmt)
+    public void VisitPrintStmt(Stmt<T>.Print stmt)
     {
-      Object value = evaluate(stmt.expression);
+      object value = Evaluate(stmt.expression);
       System.out.println(stringify(value));
       return null;
     }
 
-//< Statements and State visit-print
-//> Functions visit-return
-    @Override
+//< Statements and State Visit-print
+//> Functions Visit-return
+    
 
-    public Void visitReturnStmt(Stmt.Return stmt)
+    public void VisitReturnStmt(Stmt<T>.Return stmt)
     {
-      Object value = null;
-      if (stmt.value != null) value = evaluate(stmt.value);
+      object value = null;
+      if (stmt.value != null) value = Evaluate(stmt.value);
 
       throw new Stmt<>.Return(value);
     }
 
-//< Functions visit-return
-//> Statements and State visit-var
-    @Override
+//< Functions Visit-return
+//> Statements and State Visit-var
+    
 
-    public Void visitVarStmt(Stmt.Var stmt)
+    public void VisitVarStmt(Stmt<T>.Var stmt)
     {
-      Object value = null;
+      object value = null;
       if (stmt.initializer != null)
       {
-        value = evaluate(stmt.initializer);
+        value = Evaluate(stmt.initializer);
       }
 
-      environment.define(stmt.name.lexeme, value);
+      environment.Define(stmt.name.lexeme, value);
       return null;
     }
 
-//< Statements and State visit-var
-//> Control Flow visit-while
-    @Override
+//< Statements and State Visit-var
+//> Control Flow Visit-while
+    
 
-    public Void visitWhileStmt(Stmt.While stmt)
+    public void VisitWhileStmt(Stmt<T>.While stmt)
     {
-      while (isTruthy(evaluate(stmt.condition)))
+      while (isTruthy(Evaluate(stmt.condition)))
       {
-        execute(stmt.body);
+        Execute(stmt.body);
       }
 
       return null;
     }
 
-//< Control Flow visit-while
-//> Statements and State visit-assign
-    @Override
+//< Control Flow Visit-while
+//> Statements and State Visit-assign
+    
 
-    public Object visitAssignExpr(Expr<Stmt<T>>.Assign expr)
+    public object VisitAssignExpr(Expr<Stmt<T>>.Assign expr)
     {
-      Object value = evaluate(expr.value);
-/* Statements and State visit-assign < Resolving and Binding resolved-assign
+      object value = Evaluate(expr.value);
+/* Statements and State Visit-assign < Resolving and Binding resolved-assign
     environment.assign(expr.name, value);
 */
 //> Resolving and Binding resolved-assign
@@ -319,14 +303,14 @@ namespace LoxInterpreter
       return value;
     }
 
-//< Statements and State visit-assign
-//> visit-binary
-    @Override
+//< Statements and State Visit-assign
+//> Visit-binary
+    
 
-    public Object visitBinaryExpr(Expr<Stmt<T>>.Binary expr)
+    public object VisitBinaryExpr(Expr<Stmt<T>>.Binary expr)
     {
-      Object left = evaluate(expr.left);
-      Object right = evaluate(expr.right); // [left]
+      object left = Evaluate(expr.left);
+      object right = Evaluate(expr.right); // [left]
 
       switch (expr.operator.
 
@@ -370,8 +354,8 @@ namespace LoxInterpreter
           return (double) left + (double) right;
         } // [plus]
 
-        if (left instanceof String && right instanceof String) {
-          return (String) left + (String) right;
+        if (left instanceof string && right instanceof string) {
+          return (string) left + (string) right;
         }
 
 /* Evaluating Expressions binary-plus < Evaluating Expressions string-wrong-type
@@ -398,19 +382,19 @@ namespace LoxInterpreter
       return null;
     }
 
-//< visit-binary
-//> Functions visit-call
-    @Override
+//< Visit-binary
+//> Functions Visit-call
+    
 
-    public Object visitCallExpr(Expr<Stmt<T>>.Call expr)
+    public object VisitCallExpr(Expr<Stmt<T>>.Call expr)
     {
-      Object callee = evaluate(expr.callee);
+      object callee = Evaluate(expr.callee);
 
-      List<Object> arguments = new ArrayList<>();
+      List<object> arguments = new ArrayList<>();
       for (Expr<Stmt<T>> argument :
       expr.arguments) {
         // [in-order]
-        arguments.add(evaluate(argument));
+        arguments.add(Evaluate(argument));
       }
 
 //> check-is-callable
@@ -433,13 +417,13 @@ namespace LoxInterpreter
       return function.call(this, arguments);
     }
 
-//< Functions visit-call
-//> Classes interpreter-visit-get
-    @Override
+//< Functions Visit-call
+//> Classes interpreter-Visit-get
+    
 
-    public Object visitGetExpr(Expr<Stmt<T>>.Get expr)
+    public object VisitGetExpr(Expr<Stmt<T>>.Get expr)
     {
-      Object object = evaluate(expr.object);
+      object object = Evaluate(expr.object);
       if (object instanceof LoxInstance) {
         return ((LoxInstance) object).get(expr.name);
       }
@@ -448,31 +432,31 @@ namespace LoxInterpreter
         "Only instances have properties.");
     }
 
-//< Classes interpreter-visit-get
-//> visit-grouping
-    @Override
+//< Classes interpreter-Visit-get
+//> Visit-grouping
+    
 
-    public Object visitGroupingExpr(Expr<Stmt<T>>.Grouping expr)
+    public object VisitGroupingExpr(Expr<Stmt<T>>.Grouping expr)
     {
-      return evaluate(expr.expression);
+      return Evaluate(expr.expression);
     }
 
-//< visit-grouping
-//> visit-literal
-    @Override
+//< Visit-grouping
+//> Visit-literal
+    
 
-    public Object visitLiteralExpr(Expr<Stmt<T>>.Literal expr)
+    public object VisitLiteralExpr(Expr<Stmt<T>>.Literal expr)
     {
       return expr.value;
     }
 
-//< visit-literal
-//> Control Flow visit-logical
-    @Override
+//< Visit-literal
+//> Control Flow Visit-logical
+    
 
-    public Object visitLogicalExpr(Expr<Stmt<T>>.Logical expr)
+    public object VisitLogicalExpr(Expr<Stmt<T>>.Logical expr)
     {
-      Object left = evaluate(expr.left);
+      object left = Evaluate(expr.left);
 
       if (expr.operator.type == TokenType.OR) {
         if (isTruthy(left)) return left;
@@ -480,16 +464,16 @@ namespace LoxInterpreter
         if (!isTruthy(left)) return left;
       }
 
-      return evaluate(expr.right);
+      return Evaluate(expr.right);
     }
 
-//< Control Flow visit-logical
-//> Classes interpreter-visit-set
-    @Override
+//< Control Flow Visit-logical
+//> Classes interpreter-Visit-set
+    
 
-    public Object visitSetExpr(Expr<Stmt<T>>.Set expr)
+    public object VisitSetExpr(Expr<Stmt<T>>.Set expr)
     {
-      Object object = evaluate(expr.object);
+      object object = Evaluate(expr.object);
 
       if (!(object instanceof LoxInstance)) {
         // [order]
@@ -497,16 +481,16 @@ namespace LoxInterpreter
           "Only instances have fields.");
       }
 
-      Object value = evaluate(expr.value);
+      object value = Evaluate(expr.value);
       ((LoxInstance) object).set(expr.name, value);
       return value;
     }
 
-//< Classes interpreter-visit-set
-//> Inheritance interpreter-visit-super
-    @Override
+//< Classes interpreter-Visit-set
+//> Inheritance interpreter-Visit-super
+    
 
-    public Object visitSuperExpr(Expr<Stmt<T>>.Super expr)
+    public object VisitSuperExpr(Expr<Stmt<T>>.Super expr)
     {
       int distance = locals.get(expr);
       LoxClass superclass = (LoxClass) environment.getAt(
@@ -532,22 +516,22 @@ namespace LoxInterpreter
 //< super-find-method
     }
 
-//< Inheritance interpreter-visit-super
-//> Classes interpreter-visit-this
-    @Override
+//< Inheritance interpreter-Visit-super
+//> Classes interpreter-Visit-this
+    
 
-    public Object visitThisExpr(Expr<Stmt<T>>.This expr)
+    public object VisitThisExpr(Expr<Stmt<T>>.This expr)
     {
       return lookUpVariable(expr.keyword, expr);
     }
 
-//< Classes interpreter-visit-this
-//> visit-unary
-    @Override
+//< Classes interpreter-Visit-this
+//> Visit-unary
+    
 
-    public Object visitUnaryExpr(Expr<Stmt<T>>.Unary expr)
+    public object VisitUnaryExpr(Expr<Stmt<T>>.Unary expr)
     {
-      Object right = evaluate(expr.right);
+      object right = Evaluate(expr.right);
 
       switch (expr.operator.
 
@@ -567,13 +551,13 @@ namespace LoxInterpreter
       return null;
     }
 
-//< visit-unary
-//> Statements and State visit-variable
-    @Override
+//< Visit-unary
+//> Statements and State Visit-variable
+    
 
-    public Object visitVariableExpr(Expr<Stmt<T>>.Variable expr)
+    public object VisitVariableExpr(Expr<Stmt<T>>.Variable expr)
     {
-/* Statements and State visit-variable < Resolving and Binding call-look-up-variable
+/* Statements and State Visit-variable < Resolving and Binding call-look-up-variable
     return environment.get(expr.name);
 */
 //> Resolving and Binding call-look-up-variable
@@ -582,7 +566,7 @@ namespace LoxInterpreter
     }
 
 //> Resolving and Binding look-up-variable
-    private Object lookUpVariable(Token name, Expr<Stmt<T>> expr)
+    private object lookUpVariable(Token name, Expr<Stmt<T>> expr)
     {
       Integer distance = locals.get(expr);
       if (distance != null)
@@ -596,9 +580,9 @@ namespace LoxInterpreter
     }
 
 //< Resolving and Binding look-up-variable
-//< Statements and State visit-variable
+//< Statements and State Visit-variable
 //> check-operand
-    private void checkNumberOperand(Token operator, Object operand)
+    private void checkNumberOperand(Token operator, object operand)
     {
       if (operand instanceof Double) return;
       throw new RuntimeError(operator, "Operand must be a number.");
@@ -607,7 +591,7 @@ namespace LoxInterpreter
 //< check-operand
 //> check-operands
     private void checkNumberOperands(Token operator,
-      Object left, Object right)
+      object left, object right)
     {
       if (left instanceof Double && right instanceof Double) return;
       // [operand]
@@ -616,7 +600,7 @@ namespace LoxInterpreter
 
 //< check-operands
 //> is-truthy
-    private boolean isTruthy(Object object) {
+    private boolean isTruthy(object object) {
       if (object == null) return false;
       if (object instanceof Boolean) return (boolean) object;
       return true;
@@ -624,7 +608,7 @@ namespace LoxInterpreter
 
 //< is-truthy
 //> is-equal
-    private boolean isEqual(Object a, Object b)
+    private boolean isEqual(object a, object b)
     {
       if (a == null && b == null) return true;
       if (a == null) return false;
@@ -634,11 +618,11 @@ namespace LoxInterpreter
 
 //< is-equal
 //> stringify
-    private String stringify(Object object) {
+    private string stringify(object object) {
       if (object == null) return "nil";
 
       if (object instanceof Double) {
-        String text = object.toString();
+        string text = object.toString();
         if (text.endsWith(".0"))
         {
           text = text.substring(0, text.length() - 2);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter.Properties
 {
-  abstract public class Expr<T>
+  public abstract class Expr<T>
   {
     public interface IVisitor
     {
@@ -34,7 +34,7 @@ namespace LoxInterpreter.Properties
         this.value = value;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitAssignExpr(this);
       }
@@ -51,7 +51,7 @@ namespace LoxInterpreter.Properties
         this.right = right;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitBinaryExpr(this);
       }
@@ -72,7 +72,7 @@ namespace LoxInterpreter.Properties
         this.arguments = arguments;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitCallExpr(this);
       }
@@ -91,7 +91,7 @@ namespace LoxInterpreter.Properties
         this.name = name;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitGetExpr(this);
       }
@@ -109,7 +109,7 @@ namespace LoxInterpreter.Properties
         this.expression = expression;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitGroupingExpr(this);
       }
@@ -126,7 +126,7 @@ namespace LoxInterpreter.Properties
         this.value = value;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitLiteralExpr(this);
       }
@@ -145,7 +145,7 @@ namespace LoxInterpreter.Properties
         this.right = right;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitLogicalExpr(this);
       }
@@ -165,7 +165,7 @@ namespace LoxInterpreter.Properties
         this.value = value;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitSetExpr(this);
       }
@@ -185,7 +185,7 @@ namespace LoxInterpreter.Properties
         this.method = method;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitSuperExpr(this);
       }
@@ -203,7 +203,7 @@ namespace LoxInterpreter.Properties
         this.keyword = keyword;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitThisExpr(this);
       }
@@ -221,7 +221,7 @@ namespace LoxInterpreter.Properties
         this.right = right;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitUnaryExpr(this);
       }
@@ -239,7 +239,7 @@ namespace LoxInterpreter.Properties
         this.name = name;
       }
 
-      public override T accept(IVisitor visitor)
+      public override T Accept(IVisitor visitor)
       {
         return visitor.VisitVariableExpr(this);
       }
@@ -248,6 +248,6 @@ namespace LoxInterpreter.Properties
     }
     //< expr-variable
 
-    public abstract T accept(IVisitor visitor);
+    public abstract T Accept(IVisitor visitor);
   }
 }
