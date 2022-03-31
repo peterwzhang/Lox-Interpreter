@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LoxInterpreter.Properties
+namespace LoxInterpreter
 {
   public abstract class Expr<T>
   {
@@ -15,8 +15,8 @@ namespace LoxInterpreter.Properties
       T VisitLiteralExpr(Literal expr);
       T VisitLogicalExpr(Logical expr);
       T VisitSetExpr(Set expr);
-      T VisitSuperExpr(Super expr);
-      T VisitThisExpr(This expr);
+      // T VisitSuperExpr(Super expr);
+      // T VisitThisExpr(This expr);
       T VisitUnaryExpr(Unary expr);
       T VisitVariableExpr(Variable expr);
     }
@@ -90,12 +90,12 @@ namespace LoxInterpreter.Properties
         this.obj = obj;
         this.name = name;
       }
-
+    
       public override T Accept(IVisitor visitor)
       {
         return visitor.VisitGetExpr(this);
       }
-
+    
       public Expr<T> obj;
       public Token name;
     }
@@ -125,12 +125,12 @@ namespace LoxInterpreter.Properties
       {
         this.value = value;
       }
-
+    
       public override T Accept(IVisitor visitor)
       {
         return visitor.VisitLiteralExpr(this);
       }
-
+    
       public Object value;
     }
 
@@ -164,12 +164,12 @@ namespace LoxInterpreter.Properties
         this.name = name;
         this.value = value;
       }
-
+    
       public override T Accept(IVisitor visitor)
       {
         return visitor.VisitSetExpr(this);
       }
-
+    
       public Expr<T> obj;
       public Token name;
       public Expr<T> value;
@@ -177,39 +177,39 @@ namespace LoxInterpreter.Properties
 
     //< expr-set
     //> expr-super
-    public class Super : Expr<T>
-    {
-      public Super(Token keyword, Token method)
-      {
-        this.keyword = keyword;
-        this.method = method;
-      }
-
-      public override T Accept(IVisitor visitor)
-      {
-        return visitor.VisitSuperExpr(this);
-      }
-
-      public Token keyword;
-      public Token method;
-    }
+    // public class Super : Expr<T>
+    // {
+    //   public Super(Token keyword, Token method)
+    //   {
+    //     this.keyword = keyword;
+    //     this.method = method;
+    //   }
+    //
+    //   public override T Accept(IVisitor visitor)
+    //   {
+    //     return visitor.VisitSuperExpr(this);
+    //   }
+    //
+    //   public Token keyword;
+    //   public Token method;
+    // }
 
     //< expr-super
     //> expr-this
-    public class This : Expr<T>
-    {
-      public This(Token keyword)
-      {
-        this.keyword = keyword;
-      }
-
-      public override T Accept(IVisitor visitor)
-      {
-        return visitor.VisitThisExpr(this);
-      }
-
-      public Token keyword;
-    }
+    // public class This : Expr<T>
+    // {
+    //   public This(Token keyword)
+    //   {
+    //     this.keyword = keyword;
+    //   }
+    //
+    //   public override T Accept(IVisitor visitor)
+    //   {
+    //     return visitor.VisitThisExpr(this);
+    //   }
+    //
+    //   public Token keyword;
+    // }
 
     //< expr-this
     //> expr-unary
@@ -220,12 +220,12 @@ namespace LoxInterpreter.Properties
         this.op = op;
         this.right = right;
       }
-
+    
       public override T Accept(IVisitor visitor)
       {
         return visitor.VisitUnaryExpr(this);
       }
-
+    
       public Token op;
       public Expr<T> right;
     }

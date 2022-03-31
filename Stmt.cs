@@ -9,7 +9,7 @@ namespace LoxInterpreter
     public interface IVisitor
     {
       T VisitBlockStmt(Block stmt);
-      T VisitClassStmt(Class stmt);
+      //T VisitClassStmt(Class stmt);
       T VisitExpressionStmt(Expression stmt);
       T VisitFunctionStmt(Function stmt);
       T VisitIfStmt(If stmt);
@@ -39,27 +39,27 @@ namespace LoxInterpreter
 
 //< stmt-block
 //> stmt-class
-    public class Class : Stmt<T>
-    {
-
-      public Token name;
-      public Expr<T>.Variable superclass;
-      public List<Stmt<T>.Function> methods;
-
-      public Class(Token name,
-        Expr<T>.Variable superclass,
-        List<Stmt<T>.Function> methods)
-      {
-        this.name = name;
-        this.superclass = superclass;
-        this.methods = methods;
-      }
-
-      public override T Accept(IVisitor visitor)
-      {
-        return visitor.VisitClassStmt(this);
-      }
-    }
+    // public class Class : Stmt<T>
+    // {
+    //
+    //   public Token name;
+    //   public Expr<T>.Variable superclass;
+    //   public List<Stmt<T>.Function> methods;
+    //
+    //   public Class(Token name,
+    //     Expr<T>.Variable superclass,
+    //     List<Stmt<T>.Function> methods)
+    //   {
+    //     this.name = name;
+    //     this.superclass = superclass;
+    //     this.methods = methods;
+    //   }
+    //
+    //   public override T Accept(IVisitor visitor)
+    //   {
+    //     return visitor.VisitClassStmt(this);
+    //   }
+    // }
 
 //< stmt-class
 //> stmt-expression
@@ -126,6 +126,7 @@ namespace LoxInterpreter
 //> stmt-print
     public class Print : Stmt<T>
     {
+      public Expr<T> expression;
       public Print(Expr<T> expression)
       {
         this.expression = expression;
@@ -137,7 +138,6 @@ namespace LoxInterpreter
         return visitor.VisitPrintStmt(this);
       }
 
-      Expr<T> expression;
     }
 
 //< stmt-print

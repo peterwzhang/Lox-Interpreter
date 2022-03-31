@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
-    public class LoxFunction<T> : ILoxCallable
+    public class LoxFunction<T> : ILoxCallable<T>
     {
         private Stmt<T>.Function declaration;
 
@@ -66,7 +66,7 @@ namespace LoxInterpreter
         //> function-call
 
         //deleted override below
-        public object Call(Interpreter interpreter, List<object> arguments)
+        public object Call(Interpreter<T> interpreter, List<object> arguments)
         {
             /* Functions function-call < Functions call-closure
                 Environment environment = new Environment(interpreter.globals);

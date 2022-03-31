@@ -51,7 +51,7 @@ namespace LoxInterpreter.Properties
             try
             {
                 //> Classes match-class
-                if (match(TokenType.CLASS)) return classDeclaration();
+                //if (match(TokenType.CLASS)) return classDeclaration();
                 //< Classes match-class
                 //> Functions match-fun
                 if (match(TokenType.FUN)) return function("function");
@@ -69,36 +69,36 @@ namespace LoxInterpreter.Properties
 
         //< Statements and State declaration
         //> Classes parse-class-declaration
-        private Stmt<T> classDeclaration()
-        {
-            Token name = consume(TokenType.IDENTIFIER, "Expect class name.");
-            //> Inheritance parse-superclass
-
-            Expr<T>.Variable superclass = null;
-            if (match(TokenType.LESS))
-            {
-                consume(TokenType.IDENTIFIER, "Expect superclass name.");
-                superclass = new Expr<T>.Variable(previous());
-            }
-
-            //< Inheritance parse-superclass
-            consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
-
-            var methods = new List<Stmt<T>.Function>();
-            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
-            {
-                methods.Add(function("method"));
-            }
-
-            consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
-
-            /* Classes parse-class-declaration < Inheritance construct-class-ast
-                return new Stmt<T>.Class(name, methods);
-            */
-            //> Inheritance construct-class-ast
-            return new Stmt<T>.Class(name, superclass, methods);
-            //< Inheritance construct-class-ast
-        }
+        // private Stmt<T> classDeclaration()
+        // {
+        //     Token name = consume(TokenType.IDENTIFIER, "Expect class name.");
+        //     //> Inheritance parse-superclass
+        //
+        //     Expr<T>.Variable superclass = null;
+        //     if (match(TokenType.LESS))
+        //     {
+        //         consume(TokenType.IDENTIFIER, "Expect superclass name.");
+        //         superclass = new Expr<T>.Variable(previous());
+        //     }
+        //
+        //     //< Inheritance parse-superclass
+        //     consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+        //
+        //     var methods = new List<Stmt<T>.Function>();
+        //     while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
+        //     {
+        //         methods.Add(function("method"));
+        //     }
+        //
+        //     consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+        //
+        //     /* Classes parse-class-declaration < Inheritance construct-class-ast
+        //         return new Stmt<T>.Class(name, methods);
+        //     */
+        //     //> Inheritance construct-class-ast
+        //     return new Stmt<T>.Class(name, superclass, methods);
+        //     //< Inheritance construct-class-ast
+        // }
 
         //< Classes parse-class-declaration
         //> Statements and State parse-statement
@@ -546,18 +546,19 @@ namespace LoxInterpreter.Properties
             }
             //> Inheritance parse-super
 
-            if (match(TokenType.SUPER))
-            {
-                Token keyword = previous();
-                consume(TokenType.DOT, "Expect '.' after 'super'.");
-                Token method = consume(TokenType.IDENTIFIER,
-                    "Expect superclass method name.");
-                return new Expr<T>.Super(keyword, method);
-            }
-            //< Inheritance parse-super
-            //> Classes parse-this
-
-            if (match(TokenType.THIS)) return new Expr<T>.This(previous());
+            // if (match(TokenType.SUPER))
+            // {
+            //     Token keyword = previous();
+            //     consume(TokenType.DOT, "Expect '.' after 'super'.");
+            //     Token method = consume(TokenType.IDENTIFIER,
+            //         "Expect superclass method name.");
+            //     return new Expr<T>.Super(keyword, method);
+            // }
+            // //< Inheritance parse-super
+            // //> Classes parse-this
+            //
+            // if (match(TokenType.THIS)) return new Expr<T>.This(previous());
+            
             //< Classes parse-this
             //> Statements and State parse-identifier
 

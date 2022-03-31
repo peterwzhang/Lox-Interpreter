@@ -1,638 +1,654 @@
 using System;
 using System.Collections.Generic;
 using LoxInterpreter;
-using LoxInterpreter.Properties;
+//using LoxInterpreter.Properties;
 using Environment = System.Environment;
 
 namespace LoxInterpreter
 {
-  public class Interpreter<T> : Expr<T>.IVisitor, Stmt<T>.IVisitor {
+    public class Interpreter<T> : Expr<T>.IVisitor, Stmt<T>.IVisitor
+    {
 //< Statements and State interpreter
 /* Statements and State environment-field < Functions global-environment
-  private Environment environment = new Environment();
+  Environment environment = new Environment();
 */
 //> Functions global-environment
-    static Environment globals = new Environment();
+        static Environment globals = new Environment();
 
-    Environment environment = globals;
+        Environment environment = globals;
 
 //< Functions global-environment
 //> Resolving and Binding locals-field
-    private Dictionary<Expr<Stmt<T>>, int> locals = new Dictionary<Expr<Stmt<T>>, int>();
+        Dictionary<Expr<T>, int> locals = new Dictionary<Expr<T>, int>();
 //< Resolving and Binding locals-field
 //> Statements and State environment-field
 
 //< Statements and State environment-field
 //> Functions interpreter-constructor
-    public Interpreter()
-    {
-      //TODO: instance of interface?
-      globals.Define("clock", new Clock<T>());
-    }
+        public Interpreter()
+        {
+            //TODO: instance of interface?
+            globals.Define("clock", new Clock<T>());
+        }
 
 //< Functions interpreter-constructor
 /* Evaluating Expressions interpret < Statements and State interpret
   void interpret(Expr<Stmt<T>> expression) { // [void]
     try {
-      object value = Evaluate(expression);
-      System.out.println(stringify(value));
+      Object value = Evaluate(expression);
+      Console.WriteLine(stringify(value));
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
     }
   }
 */
 //> Statements and State interpret
-    public void Interpret(List<Stmt<T>> statements)
-    {
-      foreach (var statement in statements) 
-      {
-        Execute(statement);
-      }
-      // try
-      // {
-      //   for (Stmt statement :
-      //   statements) {
-      //     Execute(statement);
-      //   }
-      // }
-      // catch (RuntimeError error)
-      // {
-      //   Lox.runtimeError(error);
-      // }
-    }
+        public void Interpret(List<Stmt<T>> statements)
+        {
+            foreach (var statement in statements)
+            {
+                Execute(statement);
+            }
+            // try
+            // {
+            //   for (Stmt statement :
+            //   statements) {
+            //     Execute(statement);
+            //   }
+            // }
+            // catch (RuntimeError error)
+            // {
+            //   Lox.runtimeError(error);
+            // }
+        }
 
 //< Statements and State interpret
 //> Evaluate
-    private object Evaluate(Expr<Stmt<T>> expr)
-    {
-      return expr.Accept(this);
-    }
+        Object Evaluate(Expr<T> expr)
+        {
+            return expr.Accept(this);
+        }
 
 //< Evaluate
 //> Statements and State Execute
-    private void Execute(Stmt<T> stmt)
-    {
-      stmt.Accept(this);
-    }
+        void Execute(Stmt<T> stmt)
+        {
+            stmt.Accept(this);
+        }
 
 //< Statements and State Execute
 //> Resolving and Binding resolve
-    public void Resolve(Expr<Stmt<T>> expr, int depth)
-    {
-      locals.Add(expr, depth);
-    }
+        public void Resolve(Expr<T> expr, int depth)
+        {
+            locals.Add(expr, depth);
+        }
 
 //< Resolving and Binding resolve
 //> Statements and State Execute-block
-    public void ExecuteBlock(List<Stmt<T>> statements,
-      Environment environment)
-    {
-      Environment previous = this.environment;
-      try
-      {
-        this.environment = environment;
-
-        foreach (var statement in statements) 
+        public void ExecuteBlock(List<Stmt<T>> statements,
+            Environment env)
         {
-          Execute(statement);
+            Environment previous = this.environment;
+            try
+            {
+                this.environment = env;
+
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                this.environment = previous;
+            }
         }
-      }
-      finally
-      {
-        this.environment = previous;
-      }
-    }
 
 //< Statements and State Execute-block
 //> Statements and State Visit-block
 
-    public void VisitBlockStmt(Stmt<T>.Block stmt)
-    {
-      ExecuteBlock(stmt.statements, new Environment(environment));
-    }
+        public T VisitBlockStmt(Stmt<T>.Block stmt)
+        {
+            ExecuteBlock(stmt.statements, new Environment(environment));
+            return default;
+        }
 
 //< Statements and State Visit-block
 //> Classes interpreter-Visit-class
-    
 
-    public void VisitClassStmt(Stmt<T>.Class stmt)
-    {
-//> Inheritance interpret-superclass
-      object superclass = null;
-      if (stmt.superclass != null)
-      {
-        superclass = Evaluate(stmt.superclass);
-        if (!(superclass instanceof LoxClass)) {
-          throw new RuntimeError(stmt.superclass.name,
-            "Superclass must be a class.");
-        }
-      }
 
-//< Inheritance interpret-superclass
-      environment.Define(stmt.name.lexeme, null);
-//> Inheritance begin-superclass-environment
-
-      if (stmt.superclass != null)
-      {
-        environment = new Environment(environment);
-        environment.Define("super", superclass);
-      }
-//< Inheritance begin-superclass-environment
-//> interpret-methods
-
-      Map<string, LoxFunction> methods = new HashMap<>();
-      for (Stmt<T>.Function method :
-      stmt.methods) {
-/* Classes interpret-methods < Classes interpreter-method-initializer
-      LoxFunction function = new LoxFunction(method, environment);
-*/
-//> interpreter-method-initializer
-        LoxFunction function = new LoxFunction(method, environment,
-          method.name.lexeme.equals("init"));
-//< interpreter-method-initializer
-        methods.put(method.name.lexeme, function);
-      }
-
-/* Classes interpret-methods < Inheritance interpreter-construct-class
-    LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
-*/
-//> Inheritance interpreter-construct-class
-      LoxClass klass = new LoxClass(stmt.name.lexeme,
-        (LoxClass) superclass, methods);
-//> end-superclass-environment
-
-      if (superclass != null)
-      {
-        environment = environment.enclosing;
-      }
-//< end-superclass-environment
-
-//< Inheritance interpreter-construct-class
-//< interpret-methods
-/* Classes interpreter-Visit-class < Classes interpret-methods
-    LoxClass klass = new LoxClass(stmt.name.lexeme);
-*/
-      environment.assign(stmt.name, klass);
-      return null;
-    }
+//     public void VisitClassStmt(Stmt<T>.Class stmt)
+//     {
+// //> Inheritance interpret-superclass
+//       Object superclass = null;
+//       if (stmt.superclass != null)
+//       {
+//         superclass = Evaluate(stmt.superclass);
+//         if (!(superclass is LoxClass)) {
+//           throw new RuntimeError(stmt.superclass.name,
+//             "Superclass must be a class.");
+//         }
+//       }
+//
+// //< Inheritance interpret-superclass
+//       environment.Define(stmt.name.lexeme, null);
+// //> Inheritance begin-superclass-environment
+//
+//       if (stmt.superclass != null)
+//       {
+//         environment = new Environment(environment);
+//         environment.Define("super", superclass);
+//       }
+// //< Inheritance begin-superclass-environment
+// //> interpret-methods
+//
+//       Dictionary<String, LoxFunction<T>> methods = new Dictionary<String, LoxFunction<T>>();
+//       foreach (Stmt<T>.Function method in stmt.methods) {
+// /* Classes interpret-methods < Classes interpreter-method-initializer
+//       LoxFunction<T> function = new LoxFunction<T>(method, environment);
+// */
+// //> interpreter-method-initializer
+//         LoxFunction<T> function = new LoxFunction<T>(method, environment,
+//           method.name.lexeme.equals("init"));
+// //< interpreter-method-initializer
+//         methods.put(method.name.lexeme, function);
+//       }
+//
+// /* Classes interpret-methods < Inheritance interpreter-construct-class
+//     LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+// */
+// //> Inheritance interpreter-construct-class
+//       LoxClass klass = new LoxClass(stmt.name.lexeme,
+//         (LoxClass) superclass, methods);
+// //> end-superclass-environment
+//
+//       if (superclass != null)
+//       {
+//         environment = environment.enclosing;
+//       }
+// //< end-superclass-environment
+//
+// //< Inheritance interpreter-construct-class
+// //< interpret-methods
+// /* Classes interpreter-Visit-class < Classes interpret-methods
+//     LoxClass klass = new LoxClass(stmt.name.lexeme);
+// */
+//       environment.assign(stmt.name, klass);
+//       
+//     }
 
 //< Classes interpreter-Visit-class
 //> Statements and State Visit-expression-stmt
-    
 
-    public void VisitExpressionStmt(Stmt<T>.Expression stmt)
-    {
-      Evaluate(stmt.expression);
-      return null;
-    }
+
+        public T VisitExpressionStmt(Stmt<T>.Expression stmt)
+        {
+            Evaluate(stmt.expression);
+
+            return default;
+
+        }
 
 //< Statements and State Visit-expression-stmt
 //> Functions Visit-function
-    
 
-    public void VisitFunctionStmt(Stmt<T>.Function stmt)
-    {
+
+        public T VisitFunctionStmt(Stmt<T>.Function stmt)
+        {
 /* Functions Visit-function < Functions Visit-closure
-    LoxFunction function = new LoxFunction(stmt);
+    LoxFunction<T> function = new LoxFunction<T>(stmt);
 */
 /* Functions Visit-closure < Classes construct-function
-    LoxFunction function = new LoxFunction(stmt, environment);
+    LoxFunction<T> function = new LoxFunction<T>(stmt, environment);
 */
 //> Classes construct-function
-      LoxFunction function = new LoxFunction(stmt, environment,
-        false);
+            LoxFunction<T> function = new LoxFunction<T>(stmt, environment,
+                false);
 //< Classes construct-function
-      environment.Define(stmt.name.lexeme, function);
-      return null;
-    }
+            environment.Define(stmt.name.lexeme, function);
+            return default;
+
+        }
 
 //< Functions Visit-function
 //> Control Flow Visit-if
-    
 
-    public void VisitIfStmt(Stmt<T>.If stmt)
-    {
-      if (isTruthy(Evaluate(stmt.condition)))
-      {
-        Execute(stmt.thenBranch);
-      }
-      else if (stmt.elseBranch != null)
-      {
-        Execute(stmt.elseBranch);
-      }
 
-      return null;
-    }
+        public T VisitIfStmt(Stmt<T>.If stmt)
+        {
+            if (isTruthy(Evaluate(stmt.condition)))
+            {
+                Execute(stmt.thenBranch);
+            }
+            else if (stmt.elseBranch != null)
+            {
+                Execute(stmt.elseBranch);
+            }
+            
+            return default;
+
+        }
 
 //< Control Flow Visit-if
 //> Statements and State Visit-print
-    
 
-    public void VisitPrintStmt(Stmt<T>.Print stmt)
-    {
-      object value = Evaluate(stmt.expression);
-      System.out.println(stringify(value));
-      return null;
-    }
+
+        public T VisitPrintStmt(Stmt<T>.Print stmt)
+        {
+            Object value = Evaluate(stmt.expression);
+            Console.WriteLine(stringify(value));
+            
+            return default;
+
+        }
 
 //< Statements and State Visit-print
 //> Functions Visit-return
-    
 
-    public void VisitReturnStmt(Stmt<T>.Return stmt)
-    {
-      object value = null;
-      if (stmt.value != null) value = Evaluate(stmt.value);
 
-      throw new Stmt<>.Return(value);
-    }
+        public T VisitReturnStmt(Stmt<T>.Return stmt)
+        {
+            Object value = null;
+            if (stmt.value != null) value = Evaluate(stmt.value);
+
+            //throw new Stmt<T>.Return(value); //! maybe important
+            return default;
+        }
 
 //< Functions Visit-return
 //> Statements and State Visit-var
-    
 
-    public void VisitVarStmt(Stmt<T>.Var stmt)
-    {
-      object value = null;
-      if (stmt.initializer != null)
-      {
-        value = Evaluate(stmt.initializer);
-      }
 
-      environment.Define(stmt.name.lexeme, value);
-      return null;
-    }
+        public T VisitVarStmt(Stmt<T>.Var stmt)
+        {
+            Object value = null;
+            if (stmt.initializer != null)
+            {
+                value = Evaluate(stmt.initializer);
+            }
+
+            environment.Define(stmt.name.lexeme, value);
+            return default;
+        }
 
 //< Statements and State Visit-var
 //> Control Flow Visit-while
-    
 
-    public void VisitWhileStmt(Stmt<T>.While stmt)
-    {
-      while (isTruthy(Evaluate(stmt.condition)))
-      {
-        Execute(stmt.body);
-      }
 
-      return null;
-    }
+        public T VisitWhileStmt(Stmt<T>.While stmt)
+        {
+            while (isTruthy(Evaluate(stmt.condition)))
+            {
+                Execute(stmt.body);
+            }
+
+            return default;
+        }
 
 //< Control Flow Visit-while
 //> Statements and State Visit-assign
-    
 
-    public object VisitAssignExpr(Expr<Stmt<T>>.Assign expr)
-    {
-      object value = Evaluate(expr.value);
+
+        public T VisitAssignExpr(Expr<T>.Assign expr)
+        {
+            Object value = Evaluate(expr.value);
 /* Statements and State Visit-assign < Resolving and Binding resolved-assign
     environment.assign(expr.name, value);
 */
 //> Resolving and Binding resolved-assign
 
-      Integer distance = locals.get(expr);
-      if (distance != null)
-      {
-        environment.assignAt(distance, expr.name, value);
-      }
-      else
-      {
-        globals.assign(expr.name, value);
-      }
+            int distance = locals[expr];
+            if (distance != 0)
+            {
+                environment.AssignAt(distance, expr.name, value);
+            }
+            else
+            {
+                globals.Assign(expr.name, value);
+            }
 
 //< Resolving and Binding resolved-assign
-      return value;
-    }
+            return (T) value; // TODO: fix dis
+        }
 
 //< Statements and State Visit-assign
 //> Visit-binary
-    
 
-    public object VisitBinaryExpr(Expr<Stmt<T>>.Binary expr)
-    {
-      object left = Evaluate(expr.left);
-      object right = Evaluate(expr.right); // [left]
 
-      switch (expr.operator.
+        public T VisitBinaryExpr(Expr<T>.Binary expr)
+        {
+            Object left = Evaluate(expr.left);
+            Object right = Evaluate(expr.right); // [left]
 
-      type) {
+            switch (expr.op.type)
+            {
 //> binary-equality
-        case BANG_EQUAL:
-        return !isEqual(left, right);
-        case EQUAL_EQUAL:
-        return isEqual(left, right);
+                case TokenType.BANG_EQUAL:
+                    return (T)(Object)(left != right); // TODO: fix dis
+                case TokenType.EQUAL_EQUAL:
+                    return (T)(Object)(left == right); // TODO: fix dis & belo
 //< binary-equality
 //> binary-comparison
-        case GREATER:
+                case TokenType.GREATER:
 //> check-greater-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-greater-operand
-        return (double) left > (double) right;
-        case GREATER_EQUAL:
+                    return (T)(Object)((double) left > (double) right);
+                case TokenType.GREATER_EQUAL:
 //> check-greater-equal-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-greater-equal-operand
-        return (double) left >= (double) right;
-        case LESS:
+                    return (T)(Object)((double) left >= (double) right);
+                case TokenType.LESS:
 //> check-less-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-less-operand
-        return (double) left < (double) right;
-        case LESS_EQUAL:
+                    return (T)(Object)((double) left < (double) right);
+                case TokenType.LESS_EQUAL:
 //> check-less-equal-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-less-equal-operand
-        return (double) left <= (double) right;
+                    return (T)(Object)((double) left <= (double) right);
 //< binary-comparison
-        case MINUS:
+                case TokenType.MINUS:
 //> check-minus-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-minus-operand
-        return (double) left - (double) right;
+                    return (T)(Object)((double) left - (double) right);
 //> binary-plus
-        case PLUS:
-        if (left instanceof Double && right instanceof Double) {
-          return (double) left + (double) right;
-        } // [plus]
+                case TokenType.PLUS:
+                    if (left is Double && right is Double)
+                    {
+                        return (T)(Object)((double) left + (double) right);
+                    } // [plus]
 
-        if (left instanceof string && right instanceof string) {
-          return (string) left + (string) right;
-        }
+                    if (left is String && right is String)
+                    {
+                        return (T)(Object)((String) left + (String) right);
+                    }
 
-/* Evaluating Expressions binary-plus < Evaluating Expressions string-wrong-type
+                    break;
+
+/* Evaluating Expressions binary-plus < Evaluating Expressions String-wrong-type
         break;
 */
-//> string-wrong-type
-        throw new RuntimeError(expr.operator,
-          "Operands must be two numbers or two strings.");
-//< string-wrong-type
+//> String-wrong-type
+                    //throw new RuntimeError(expr.op, "Operands must be two numbers or two strings.");
+//< String-wrong-type
 //< binary-plus
-        case SLASH:
+                case TokenType.SLASH:
 //> check-slash-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-slash-operand
-        return (double) left / (double) right;
-        case STAR:
+                    return (T)(Object)((double) left / (double) right);
+                case TokenType.STAR:
 //> check-star-operand
-        checkNumberOperands(expr.operator, left, right);
+                    CheckNumberOperands(expr.op, left, right);
 //< check-star-operand
-        return (double) left * (double) right;
-      }
+                    return (T)(Object)((double) left * (double) right);
+            }
 
-      // Unreachable.
-      return null;
-    }
+            return default;
+
+            // Unreachable.
+
+        }
 
 //< Visit-binary
 //> Functions Visit-call
-    
 
-    public object VisitCallExpr(Expr<Stmt<T>>.Call expr)
-    {
-      object callee = Evaluate(expr.callee);
 
-      List<object> arguments = new ArrayList<>();
-      for (Expr<Stmt<T>> argument :
-      expr.arguments) {
-        // [in-order]
-        arguments.add(Evaluate(argument));
-      }
+        public T VisitCallExpr(Expr<T>.Call expr)
+        {
+            Object callee = Evaluate(expr.callee);
+
+            List<object> arguments = new List<object>();
+            foreach (Expr<T> argument in expr.arguments)
+            {
+                // [in-order]
+                arguments.Add(Evaluate(argument));
+            }
 
 //> check-is-callable
-      if (!(callee instanceof LoxCallable)) {
-        throw new RuntimeError(expr.paren,
-          "Can only call functions and classes.");
-      }
+            // if (!(callee is ILoxCallable)) {
+            //   throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+            // }
 
 //< check-is-callable
-      LoxCallable function = (LoxCallable) callee;
+            ILoxCallable<T> function = (ILoxCallable<T>) callee;
 //> check-arity
-      if (arguments.size() != function.arity())
-      {
-        throw new RuntimeError(expr.paren, "Expected " +
-                                           function.arity() + " arguments but got " +
-                                           arguments.size() + ".");
-      }
+            // if (arguments.Count != function.arity())
+            // {
+            //   throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
+            // }
 
 //< check-arity
-      return function.call(this, arguments);
-    }
+            return (T)(Object) function.Call(this, arguments); //TODO: fix dis
+        }
 
 //< Functions Visit-call
 //> Classes interpreter-Visit-get
-    
 
-    public object VisitGetExpr(Expr<Stmt<T>>.Get expr)
-    {
-      object object = Evaluate(expr.object);
-      if (object instanceof LoxInstance) {
-        return ((LoxInstance) object).get(expr.name);
-      }
 
-      throw new RuntimeError(expr.name,
-        "Only instances have properties.");
-    }
+        public T VisitGetExpr(Expr<T>.Get expr)
+        {
+          // Object obj = Evaluate(expr.obj);
+          // if (Object is LoxInstance) {
+          //   return ((LoxInstance) object).get(expr.name);
+          // }
+          //
+          // throw new RuntimeError(expr.name,
+          //   "Only instances have properties.");
+          return default;
+        }
 
 //< Classes interpreter-Visit-get
 //> Visit-grouping
-    
 
-    public object VisitGroupingExpr(Expr<Stmt<T>>.Grouping expr)
-    {
-      return Evaluate(expr.expression);
-    }
+
+        public T VisitGroupingExpr(Expr<T>.Grouping expr)
+        {
+            return (T)(Object)Evaluate(expr.expression); // TODO: fix dis
+        }
 
 //< Visit-grouping
 //> Visit-literal
-    
 
-    public object VisitLiteralExpr(Expr<Stmt<T>>.Literal expr)
-    {
-      return expr.value;
-    }
+
+        public T VisitLiteralExpr(Expr<T>.Literal expr)
+        {
+            return (T) expr.value;
+        }
 
 //< Visit-literal
 //> Control Flow Visit-logical
-    
 
-    public object VisitLogicalExpr(Expr<Stmt<T>>.Logical expr)
-    {
-      object left = Evaluate(expr.left);
 
-      if (expr.operator.type == TokenType.OR) {
-        if (isTruthy(left)) return left;
-      } else {
-        if (!isTruthy(left)) return left;
-      }
+        public T VisitLogicalExpr(Expr<T>.Logical expr)
+        {
+            Object left = Evaluate(expr.left);
 
-      return Evaluate(expr.right);
-    }
+            if (expr.op.type == TokenType.OR)
+            {
+                if (isTruthy(left)) return (T) left;
+            }
+            else
+            {
+                if (!isTruthy(left)) return (T)  left;
+            }
+
+            return (T) Evaluate(expr.right);
+        }
 
 //< Control Flow Visit-logical
 //> Classes interpreter-Visit-set
-    
 
-    public object VisitSetExpr(Expr<Stmt<T>>.Set expr)
-    {
-      object object = Evaluate(expr.object);
-
-      if (!(object instanceof LoxInstance)) {
-        // [order]
-        throw new RuntimeError(expr.name,
-          "Only instances have fields.");
-      }
-
-      object value = Evaluate(expr.value);
-      ((LoxInstance) object).set(expr.name, value);
-      return value;
-    }
+        
+        public T VisitSetExpr(Expr<T>.Set expr)
+        {
+          // Object o = Evaluate(expr.obj);
+          //
+          // if (!(Object is LoxInstance)) {
+          //   // [order]
+          //   throw new RuntimeError(expr.name,
+          //     "Only instances have fields.");
+          // }
+          //
+           // Object value = Evaluate(expr.value);
+           // ((LoxInstance) o).set(expr.name, value);
+          // return value;
+          return default;
+        }
 
 //< Classes interpreter-Visit-set
 //> Inheritance interpreter-Visit-super
-    
 
-    public object VisitSuperExpr(Expr<Stmt<T>>.Super expr)
-    {
-      int distance = locals.get(expr);
-      LoxClass superclass = (LoxClass) environment.getAt(
-        distance, "super");
-//> super-find-this
 
-      LoxInstance object = (LoxInstance) environment.getAt(
-        distance - 1, "this");
-//< super-find-this
-//> super-find-method
-
-      LoxFunction method = superclass.findMethod(expr.method.lexeme);
-//> super-no-method
-
-      if (method == null)
-      {
-        throw new RuntimeError(expr.method,
-          "Undefined property '" + expr.method.lexeme + "'.");
-      }
+//     public Object VisitSuperExpr(Expr<Stmt<T>>.Super expr)
+//     {
+//       int distance = locals.get(expr);
+//       LoxClass superclass = (LoxClass) environment.getAt(
+//         distance, "super");
+// //> super-find-this
+//
+//       LoxInstance Object = (LoxInstance) environment.getAt(
+//         distance - 1, "this");
+// //< super-find-this
+// //> super-find-method
+//
+//       LoxFunction<T> method = superclass.findMethod(expr.method.lexeme);
+// //> super-no-method
+//
+//       if (method == null)
+//       {
+//         throw new RuntimeError(expr.method,
+//           "Undefined property '" + expr.method.lexeme + "'.");
+//       }
 
 //< super-no-method
-      return method.bind(object);
+//      return method.bind(object);
 //< super-find-method
-    }
+//    }
 
 //< Inheritance interpreter-Visit-super
 //> Classes interpreter-Visit-this
-    
 
-    public object VisitThisExpr(Expr<Stmt<T>>.This expr)
-    {
-      return lookUpVariable(expr.keyword, expr);
-    }
+        //
+        // public Object VisitThisExpr(Expr<Stmt<T>>.This expr)
+        // {
+        //   return lookUpVariable(expr.keyword, expr);
+        // }
 
 //< Classes interpreter-Visit-this
 //> Visit-unary
-    
-
-    public object VisitUnaryExpr(Expr<Stmt<T>>.Unary expr)
+//     
+//
+    public T VisitUnaryExpr(Expr<T>.Unary expr)
     {
-      object right = Evaluate(expr.right);
+      Object right = Evaluate(expr.right);
 
-      switch (expr.operator.
-
-      type) {
+      switch (expr.op.type) {
 //> unary-bang
-        case BANG:
-        return !isTruthy(right);
+        case TokenType.BANG:
+        return (T) (Object)!isTruthy(right);
 //< unary-bang
-        case MINUS:
+        case TokenType.MINUS:
 //> check-unary-operand
-        checkNumberOperand(expr.operator, right);
+        CheckNumberOperand(expr.op, right);
 //< check-unary-operand
-        return -(double) right;
+        return (T)(Object) (-(double) right);
       }
 
       // Unreachable.
-      return null;
+      return default;
     }
 
 //< Visit-unary
 //> Statements and State Visit-variable
-    
 
-    public object VisitVariableExpr(Expr<Stmt<T>>.Variable expr)
-    {
+
+        public T VisitVariableExpr(Expr<T>.Variable expr)
+        {
 /* Statements and State Visit-variable < Resolving and Binding call-look-up-variable
     return environment.get(expr.name);
 */
 //> Resolving and Binding call-look-up-variable
-      return lookUpVariable(expr.name, expr);
+            return (T) LookUpVariable(expr.name, expr);
 //< Resolving and Binding call-look-up-variable
-    }
+        }
 
 //> Resolving and Binding look-up-variable
-    private object lookUpVariable(Token name, Expr<Stmt<T>> expr)
-    {
-      Integer distance = locals.get(expr);
-      if (distance != null)
-      {
-        return environment.getAt(distance, name.lexeme);
-      }
-      else
-      {
-        return globals.get(name);
-      }
-    }
+        Object LookUpVariable(Token name, Expr<T> expr)
+        {
+            int distance = locals[expr];
+            if (distance != 0)
+            {
+                return environment.GetAt(distance, name.lexeme);
+            }
+            else
+            {
+                return globals.Get(name);
+            }
+        }
 
 //< Resolving and Binding look-up-variable
 //< Statements and State Visit-variable
 //> check-operand
-    private void checkNumberOperand(Token operator, object operand)
-    {
-      if (operand instanceof Double) return;
-      throw new RuntimeError(operator, "Operand must be a number.");
-    }
+        void CheckNumberOperand(Token op, Object operand)
+        {
+            if (operand is Double) return;
+            //throw new RuntimeError(op, "Operand must be a number.");
+        }
 
 //< check-operand
 //> check-operands
-    private void checkNumberOperands(Token operator,
-      object left, object right)
-    {
-      if (left instanceof Double && right instanceof Double) return;
-      // [operand]
-      throw new RuntimeError(operator, "Operands must be numbers.");
-    }
+        void CheckNumberOperands(Token op,
+            Object left, Object right)
+        {
+            if (left is Double && right is Double) return;
+            // [operand]
+            //throw new RuntimeError(op, "Operands must be numbers.");
+        }
 
 //< check-operands
 //> is-truthy
-    private boolean isTruthy(object object) {
-      if (object == null) return false;
-      if (object instanceof Boolean) return (boolean) object;
-      return true;
-    }
+        private bool isTruthy(Object obj)
+        {
+            if (obj == null) return false;
+            if (obj is Boolean) return (bool) obj;
+            return true;
+        }
 
 //< is-truthy
 //> is-equal
-    private boolean isEqual(object a, object b)
-    {
-      if (a == null && b == null) return true;
-      if (a == null) return false;
+        private bool isEqual(Object a, Object b)
+        {
+            if (a == null && b == null) return true;
+            if (a == null) return false;
 
-      return a.equals(b);
-    }
+            return a == b;
+        }
 
 //< is-equal
 //> stringify
-    private string stringify(object object) {
-      if (object == null) return "nil";
-
-      if (object instanceof Double) {
-        string text = object.toString();
-        if (text.endsWith(".0"))
+        private String stringify(Object obj)
         {
-          text = text.substring(0, text.length() - 2);
+            if (obj == null) return "nil";
+
+            if (obj is Double)
+            {
+                String text = obj.ToString();
+                if (text.EndsWith(".0"))
+                {
+                    text = text.Substring(0, text.Length - 2);
+                }
+
+                return text;
+            }
+
+            return obj.ToString();
         }
-
-        return text;
-      }
-
-      return object.toString();
-    }
 //< stringify
-  }
+    }
 }
+  

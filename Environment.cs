@@ -93,7 +93,7 @@ namespace LoxInterpreter
 
     //< Resolving and Binding get-at
     //> Resolving and Binding assign-at
-    void assignAt(int distance, Token name, object value)
+    public void AssignAt(int distance, Token name, object value)
     {
       Ancestor(distance).values.Add(name.lexeme, value);
     }
