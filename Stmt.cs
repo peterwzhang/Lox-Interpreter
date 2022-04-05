@@ -4,9 +4,9 @@ using LoxInterpreter.Properties;
 
 namespace LoxInterpreter
 {
-  public abstract class Stmt<T>
+  public abstract class Stmt
   {
-    public interface IVisitor
+    public interface IVisitor<T>
     {
       T VisitBlockStmt(Block stmt);
       //T VisitClassStmt(Class stmt);
@@ -19,19 +19,19 @@ namespace LoxInterpreter
       T VisitWhileStmt(While stmt);
     }
 
-    // Nested Stmt<T> classes here...
+    // Nested Stmt classes here...
 //> stmt-block
-    public class Block : Stmt<T>
+    public class Block : Stmt
     {
 
-      public List<Stmt<T>> statements;
+      public List<Stmt> statements;
 
-      public Block(List<Stmt<T>> statements)
+      public Block(List<Stmt> statements)
       {
         this.statements = statements;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitBlockStmt(this);
       }
@@ -39,23 +39,23 @@ namespace LoxInterpreter
 
 //< stmt-block
 //> stmt-class
-    // public class Class : Stmt<T>
+    // public class Class : Stmt
     // {
     //
     //   public Token name;
-    //   public Expr<T>.Variable superclass;
-    //   public List<Stmt<T>.Function> methods;
+    //   public Expr.Variable superclass;
+    //   public List<Stmt.Function> methods;
     //
     //   public Class(Token name,
-    //     Expr<T>.Variable superclass,
-    //     List<Stmt<T>.Function> methods)
+    //     Expr.Variable superclass,
+    //     List<Stmt.Function> methods)
     //   {
     //     this.name = name;
     //     this.superclass = superclass;
     //     this.methods = methods;
     //   }
     //
-    //   public override T Accept(IVisitor visitor)
+    //   public override T Accept<T>(IVisitor visitor)
     //   {
     //     return visitor.VisitClassStmt(this);
     //   }
@@ -63,26 +63,26 @@ namespace LoxInterpreter
 
 //< stmt-class
 //> stmt-expression
-    public class Expression : Stmt<T>
+    public class Expression : Stmt
     {
-      public Expression(Expr<T> expression)
+      public Expression(Expr expression)
       {
         this.expression = expression;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitExpressionStmt(this);
       }
 
-      public Expr<T> expression;
+      public Expr expression;
     }
 
 //< stmt-expression
 //> stmt-function
-    public class Function : Stmt<T>
+    public class Function : Stmt
     {
-      public Function(Token name, List<Token> parms, List<Stmt<T>> body)
+      public Function(Token name, List<Token> parms, List<Stmt> body)
       {
         this.name = name;
         this.parms = parms;
@@ -90,50 +90,48 @@ namespace LoxInterpreter
       }
 
       public override
-        T Accept(IVisitor visitor)
+        T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitFunctionStmt(this);
       }
 
       public Token name;
       public List<Token> parms;
-      public List<Stmt<T>> body;
+      public List<Stmt> body;
     }
 
 //< stmt-function
 //> stmt-if
-    public class If : Stmt<T>
+    public class If : Stmt
     {
-      public If(Expr<T> condition, Stmt<T> thenBranch, Stmt<T> elseBranch)
+      public If(Expr condition, Stmt thenBranch, Stmt elseBranch)
       {
         this.condition = condition;
         this.thenBranch = thenBranch;
         this.elseBranch = elseBranch;
       }
 
-      public override
-        T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitIfStmt(this);
       }
 
-      public Expr<T> condition;
-      public Stmt<T> thenBranch;
-      public Stmt<T> elseBranch;
+      public Expr condition;
+      public Stmt thenBranch;
+      public Stmt elseBranch;
     }
 
 //< stmt-if
 //> stmt-print
-    public class Print : Stmt<T>
+    public class Print : Stmt
     {
-      public Expr<T> expression;
-      public Print(Expr<T> expression)
+      public Expr expression;
+      public Print(Expr expression)
       {
         this.expression = expression;
       }
 
-      public override
-        T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitPrintStmt(this);
       }
@@ -142,66 +140,64 @@ namespace LoxInterpreter
 
 //< stmt-print
 //> stmt-return
-    public class Return : Stmt<T>
+    public class Return : Stmt
     {
-      public Return(Token keyword, Expr<T> value)
+      public Return(Token keyword, Expr value)
       {
         this.keyword = keyword;
         this.value = value;
       }
 
-      public override
-        T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitReturnStmt(this);
       }
 
       public Token keyword;
-      public Expr<T> value;
+      public Expr value;
     }
 
 //< stmt-return
 //> stmt-var
-    public class Var : Stmt<T>
+    public class Var : Stmt
     {
-      public Var(Token name, Expr<T> initializer)
+      public Var(Token name, Expr initializer)
       {
         this.name = name;
         this.initializer = initializer;
       }
 
       public override
-        T Accept(IVisitor visitor)
+        T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitVarStmt(this);
       }
 
       public Token name;
-      public Expr<T> initializer;
+      public Expr initializer;
     }
 
 //< stmt-var
 //> stmt-while
-    public class While : Stmt<T>
+    public class While : Stmt
     {
-      public While(Expr<T> condition, Stmt<T> body)
+      public While(Expr condition, Stmt body)
       {
         this.condition = condition;
         this.body = body;
       }
 
       public override
-        T Accept(IVisitor visitor)
+        T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitWhileStmt(this);
       }
 
-      public Expr<T> condition;
-      public Stmt<T> body;
+      public Expr condition;
+      public Stmt body;
     }
 //< stmt-while
-
-    public abstract T Accept(IVisitor visitor);
+    public abstract T Accept<T>(IVisitor<T> visitor);
   }
 }
 //< Appendix II stmt

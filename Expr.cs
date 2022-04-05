@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
-  public abstract class Expr<T>
+  public abstract class Expr
   {
-    public interface IVisitor
+    public interface IVisitor<T>
     {
       T VisitAssignExpr(Assign expr);
       T VisitBinaryExpr(Binary expr);
@@ -21,20 +21,20 @@ namespace LoxInterpreter
       T VisitVariableExpr(Variable expr);
     }
 
-    // Nested Expr<T> classes here...
+    // Nested Expr classes here...
     //> expr-assign
-    public class Assign : Expr<T>
+    public class Assign : Expr
     {
 
       public Token name;
-      public Expr<T> value;
-      public Assign(Token name, Expr<T> value)
+      public Expr value;
+      public Assign(Token name, Expr value)
       {
         this.name = name;
         this.value = value;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitAssignExpr(this);
       }
@@ -42,91 +42,91 @@ namespace LoxInterpreter
 
     //< expr-assign
     //> expr-binary
-    public class Binary : Expr<T>
+    public class Binary : Expr
     {
-      public Binary(Expr<T> left, Token op, Expr<T> right)
+      public Binary(Expr left, Token op, Expr right)
       {
         this.left = left;
         this.op = op;
         this.right = right;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitBinaryExpr(this);
       }
 
-      public Expr<T> left;
+      public Expr left;
       public Token op;
-      public Expr<T> right;
+      public Expr right;
     }
 
     //< expr-binary
     //> expr-call
-    public class Call : Expr<T>
+    public class Call : Expr
     {
-      public Call(Expr<T> callee, Token paren, List<Expr<T>> arguments)
+      public Call(Expr callee, Token paren, List<Expr> arguments)
       {
         this.callee = callee;
         this.paren = paren;
         this.arguments = arguments;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitCallExpr(this);
       }
 
-      public Expr<T> callee;
+      public Expr callee;
       public Token paren;
-      public List<Expr<T>> arguments;
+      public List<Expr> arguments;
     }
 
     //< expr-call
     //> expr-get
-    public class Get : Expr<T>
+    public class Get : Expr
     {
-      public Get(Expr<T> obj, Token name) {
+      public Get(Expr obj, Token name) {
         this.obj = obj;
         this.name = name;
       }
     
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitGetExpr(this);
       }
     
-      public Expr<T> obj;
+      public Expr obj;
       public Token name;
     }
 
     //< expr-get
     //> expr-grouping
-    public class Grouping : Expr<T>
+    public class Grouping : Expr
     {
-      public Grouping(Expr<T> expression)
+      public Grouping(Expr expression)
       {
         this.expression = expression;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitGroupingExpr(this);
       }
 
-      public Expr<T> expression;
+      public Expr expression;
     }
 
     //< expr-grouping
     //> expr-literal
-    public class Literal : Expr<T>
+    public class Literal : Expr
     {
       public Literal(Object value)
       {
         this.value = value;
       }
     
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitLiteralExpr(this);
       }
@@ -136,48 +136,48 @@ namespace LoxInterpreter
 
     //< expr-literal
     //> expr-logical
-    public class Logical : Expr<T>
+    public class Logical : Expr
     {
-      public Logical(Expr<T> left, Token op, Expr<T> right)
+      public Logical(Expr left, Token op, Expr right)
       {
         this.left = left;
         this.op = op;
         this.right = right;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitLogicalExpr(this);
       }
 
-      public Expr<T> left;
+      public Expr left;
       public Token op;
-      public Expr<T> right;
+      public Expr right;
     }
 
     //< expr-logical
     //> expr-set
-    public class Set : Expr<T>
+    public class Set : Expr
     {
-      public Set(Expr<T> obj, Token name, Expr<T> value) {
+      public Set(Expr obj, Token name, Expr value) {
         this.obj = obj;
         this.name = name;
         this.value = value;
       }
     
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitSetExpr(this);
       }
     
-      public Expr<T> obj;
+      public Expr obj;
       public Token name;
-      public Expr<T> value;
+      public Expr value;
     }
 
     //< expr-set
     //> expr-super
-    // public class Super : Expr<T>
+    // public class Super : Expr
     // {
     //   public Super(Token keyword, Token method)
     //   {
@@ -185,7 +185,7 @@ namespace LoxInterpreter
     //     this.method = method;
     //   }
     //
-    //   public override T Accept(IVisitor visitor)
+    //   public override T Accept<T>(IVisitor<T> visitor)
     //   {
     //     return visitor.VisitSuperExpr(this);
     //   }
@@ -196,14 +196,14 @@ namespace LoxInterpreter
 
     //< expr-super
     //> expr-this
-    // public class This : Expr<T>
+    // public class This : Expr
     // {
     //   public This(Token keyword)
     //   {
     //     this.keyword = keyword;
     //   }
     //
-    //   public override T Accept(IVisitor visitor)
+    //   public override T Accept<T>(IVisitor<T> visitor)
     //   {
     //     return visitor.VisitThisExpr(this);
     //   }
@@ -213,33 +213,33 @@ namespace LoxInterpreter
 
     //< expr-this
     //> expr-unary
-    public class Unary : Expr<T>
+    public class Unary : Expr
     {
-      public Unary(Token op, Expr<T> right)
+      public Unary(Token op, Expr right)
       {
         this.op = op;
         this.right = right;
       }
     
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitUnaryExpr(this);
       }
     
       public Token op;
-      public Expr<T> right;
+      public Expr right;
     }
 
     //< expr-unary
     //> expr-variable
-    public class Variable : Expr<T>
+    public class Variable : Expr
     {
       public Variable(Token name)
       {
         this.name = name;
       }
 
-      public override T Accept(IVisitor visitor)
+      public override T Accept<T>(IVisitor<T> visitor)
       {
         return visitor.VisitVariableExpr(this);
       }
@@ -248,6 +248,6 @@ namespace LoxInterpreter
     }
     //< expr-variable
 
-    public abstract T Accept(IVisitor visitor);
+    public abstract T Accept<T>(IVisitor<T> visitor);
   }
 }

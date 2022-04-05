@@ -209,9 +209,16 @@ namespace LoxInterpreter
     addToken(IDENTIFIER);
 */
 //> keyword-type
-            String text = source.Substring(start, current);
-            TokenType type = keywords[text];
-            if (type == null) type = TokenType.IDENTIFIER;
+            String text = source.Substring(start, current - start);
+            bool keyExists = keywords.ContainsKey(text);
+            TokenType type;
+            if (keyExists) {
+                type = keywords[text];
+            }
+            else {
+                //keywords.Add(text, TokenType.IDENTIFIER);
+                type =  TokenType.IDENTIFIER;
+            }
             addToken(type);
 //< keyword-type
         }
@@ -232,7 +239,7 @@ namespace LoxInterpreter
             }
 
             addToken(TokenType.NUMBER,
-                Double.Parse(source.Substring(start, current)));
+                Double.Parse(source.Substring(start, current - start)));
         }
 
 //< number
@@ -254,7 +261,7 @@ namespace LoxInterpreter
             advance();
 
             // Trim the surrounding quotes.
-            String value = source.Substring(start + 1, current - 1);
+            String value = source.Substring(start + 1, current - start - 2);
             addToken(TokenType.STRING, value);
         }
 
@@ -327,7 +334,7 @@ namespace LoxInterpreter
 
         private void addToken(TokenType type, Object literal)
         {
-            String text = source.Substring(start, current);
+            String text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
 //< advance-and-add-token

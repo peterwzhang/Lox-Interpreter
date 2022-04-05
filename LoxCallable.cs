@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace LoxInterpreter
 {
 //> Functions callable
-    public interface ILoxCallable<T>
+    public interface ILoxCallable
     {
 //> callable-arity
         int Arity();
 
 //< callable-arity
-        object Call(Interpreter<T> interpreter, List<object> arguments);
+        Object Call(Interpreter interpreter, List<Object> arguments);
     }
 }

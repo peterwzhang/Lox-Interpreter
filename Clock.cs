@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
-    public class Clock<T> : ILoxCallable<T>
+    public class Clock : ILoxCallable
     {
 
         //deleted override below
@@ -13,7 +13,7 @@ namespace LoxInterpreter
         }
     
         //deleted override below
-        public object Call(Interpreter<T> interpreter, List<object> arguments)
+        public object Call(Interpreter interpreter, List<object> arguments)
         {
             long millisec = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             return (double) millisec / 1000.0;

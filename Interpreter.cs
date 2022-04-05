@@ -6,7 +6,7 @@ using Environment = System.Environment;
 
 namespace LoxInterpreter
 {
-    public class Interpreter<T> : Expr<T>.IVisitor, Stmt<T>.IVisitor
+    public class Interpreter : Expr.IVisitor<Object>, Stmt.IVisitor<Object>
     {
 //< Statements and State interpreter
 /* Statements and State environment-field < Functions global-environment
@@ -19,7 +19,7 @@ namespace LoxInterpreter
 
 //< Functions global-environment
 //> Resolving and Binding locals-field
-        Dictionary<Expr<T>, int> locals = new Dictionary<Expr<T>, int>();
+        Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
 //< Resolving and Binding locals-field
 //> Statements and State environment-field
 
@@ -28,12 +28,12 @@ namespace LoxInterpreter
         public Interpreter()
         {
             //TODO: instance of interface?
-            globals.Define("clock", new Clock<T>());
+            globals.Define("clock", new Clock());
         }
 
 //< Functions interpreter-constructor
 /* Evaluating Expressions interpret < Statements and State interpret
-  void interpret(Expr<Stmt<T>> expression) { // [void]
+  void interpret(Expr<Stmt> expression) { // [void]
     try {
       Object value = Evaluate(expression);
       Console.WriteLine(stringify(value));
@@ -43,7 +43,7 @@ namespace LoxInterpreter
   }
 */
 //> Statements and State interpret
-        public void Interpret(List<Stmt<T>> statements)
+        public void Interpret(List<Stmt> statements)
         {
             foreach (var statement in statements)
             {
@@ -64,28 +64,28 @@ namespace LoxInterpreter
 
 //< Statements and State interpret
 //> Evaluate
-        Object Evaluate(Expr<T> expr)
+        Object Evaluate(Expr expr)
         {
             return expr.Accept(this);
         }
 
 //< Evaluate
 //> Statements and State Execute
-        void Execute(Stmt<T> stmt)
+        void Execute(Stmt stmt)
         {
             stmt.Accept(this);
         }
 
 //< Statements and State Execute
 //> Resolving and Binding resolve
-        public void Resolve(Expr<T> expr, int depth)
+        public void Resolve(Expr expr, int depth)
         {
             locals.Add(expr, depth);
         }
 
 //< Resolving and Binding resolve
 //> Statements and State Execute-block
-        public void ExecuteBlock(List<Stmt<T>> statements,
+        public void ExecuteBlock(List<Stmt> statements,
             Environment env)
         {
             Environment previous = this.environment;
@@ -107,7 +107,7 @@ namespace LoxInterpreter
 //< Statements and State Execute-block
 //> Statements and State Visit-block
 
-        public T VisitBlockStmt(Stmt<T>.Block stmt)
+        public Object VisitBlockStmt(Stmt.Block stmt)
         {
             ExecuteBlock(stmt.statements, new Environment(environment));
             return default;
@@ -117,7 +117,7 @@ namespace LoxInterpreter
 //> Classes interpreter-Visit-class
 
 
-//     public void VisitClassStmt(Stmt<T>.Class stmt)
+//     public void VisitClassStmt(Stmt.Class stmt)
 //     {
 // //> Inheritance interpret-superclass
 //       Object superclass = null;
@@ -142,13 +142,13 @@ namespace LoxInterpreter
 // //< Inheritance begin-superclass-environment
 // //> interpret-methods
 //
-//       Dictionary<String, LoxFunction<T>> methods = new Dictionary<String, LoxFunction<T>>();
-//       foreach (Stmt<T>.Function method in stmt.methods) {
+//       Dictionary<String, LoxFunction> methods = new Dictionary<String, LoxFunction>();
+//       foreach (Stmt.Function method in stmt.methods) {
 // /* Classes interpret-methods < Classes interpreter-method-initializer
-//       LoxFunction<T> function = new LoxFunction<T>(method, environment);
+//       LoxFunction function = new LoxFunction(method, environment);
 // */
 // //> interpreter-method-initializer
-//         LoxFunction<T> function = new LoxFunction<T>(method, environment,
+//         LoxFunction function = new LoxFunction(method, environment,
 //           method.name.lexeme.equals("init"));
 // //< interpreter-method-initializer
 //         methods.put(method.name.lexeme, function);
@@ -181,7 +181,7 @@ namespace LoxInterpreter
 //> Statements and State Visit-expression-stmt
 
 
-        public T VisitExpressionStmt(Stmt<T>.Expression stmt)
+        public Object VisitExpressionStmt(Stmt.Expression stmt)
         {
             Evaluate(stmt.expression);
 
@@ -193,16 +193,16 @@ namespace LoxInterpreter
 //> Functions Visit-function
 
 
-        public T VisitFunctionStmt(Stmt<T>.Function stmt)
+        public Object VisitFunctionStmt(Stmt.Function stmt)
         {
 /* Functions Visit-function < Functions Visit-closure
-    LoxFunction<T> function = new LoxFunction<T>(stmt);
+    LoxFunction function = new LoxFunction(stmt);
 */
 /* Functions Visit-closure < Classes construct-function
-    LoxFunction<T> function = new LoxFunction<T>(stmt, environment);
+    LoxFunction function = new LoxFunction(stmt, environment);
 */
 //> Classes construct-function
-            LoxFunction<T> function = new LoxFunction<T>(stmt, environment,
+            LoxFunction function = new LoxFunction(stmt, environment,
                 false);
 //< Classes construct-function
             environment.Define(stmt.name.lexeme, function);
@@ -214,7 +214,7 @@ namespace LoxInterpreter
 //> Control Flow Visit-if
 
 
-        public T VisitIfStmt(Stmt<T>.If stmt)
+        public Object VisitIfStmt(Stmt.If stmt)
         {
             if (isTruthy(Evaluate(stmt.condition)))
             {
@@ -233,7 +233,7 @@ namespace LoxInterpreter
 //> Statements and State Visit-print
 
 
-        public T VisitPrintStmt(Stmt<T>.Print stmt)
+        public Object VisitPrintStmt(Stmt.Print stmt)
         {
             Object value = Evaluate(stmt.expression);
             Console.WriteLine(stringify(value));
@@ -246,12 +246,12 @@ namespace LoxInterpreter
 //> Functions Visit-return
 
 
-        public T VisitReturnStmt(Stmt<T>.Return stmt)
+        public Object VisitReturnStmt(Stmt.Return stmt)
         {
             Object value = null;
             if (stmt.value != null) value = Evaluate(stmt.value);
 
-            //throw new Stmt<T>.Return(value); //! maybe important
+            //throw new Stmt.Return(value); //! maybe important
             return default;
         }
 
@@ -259,7 +259,7 @@ namespace LoxInterpreter
 //> Statements and State Visit-var
 
 
-        public T VisitVarStmt(Stmt<T>.Var stmt)
+        public Object VisitVarStmt(Stmt.Var stmt)
         {
             Object value = null;
             if (stmt.initializer != null)
@@ -275,7 +275,7 @@ namespace LoxInterpreter
 //> Control Flow Visit-while
 
 
-        public T VisitWhileStmt(Stmt<T>.While stmt)
+        public Object VisitWhileStmt(Stmt.While stmt)
         {
             while (isTruthy(Evaluate(stmt.condition)))
             {
@@ -289,7 +289,7 @@ namespace LoxInterpreter
 //> Statements and State Visit-assign
 
 
-        public T VisitAssignExpr(Expr<T>.Assign expr)
+        public Object VisitAssignExpr(Expr.Assign expr)
         {
             Object value = Evaluate(expr.value);
 /* Statements and State Visit-assign < Resolving and Binding resolved-assign
@@ -308,14 +308,14 @@ namespace LoxInterpreter
             }
 
 //< Resolving and Binding resolved-assign
-            return (T) value; // TODO: fix dis
+            return value; // TODO: fix dis
         }
 
 //< Statements and State Visit-assign
 //> Visit-binary
 
 
-        public T VisitBinaryExpr(Expr<T>.Binary expr)
+        public Object VisitBinaryExpr(Expr.Binary expr)
         {
             Object left = Evaluate(expr.left);
             Object right = Evaluate(expr.right); // [left]
@@ -324,47 +324,47 @@ namespace LoxInterpreter
             {
 //> binary-equality
                 case TokenType.BANG_EQUAL:
-                    return (T)(Object)(left != right); // TODO: fix dis
+                    return left != right; // TODO: fix dis
                 case TokenType.EQUAL_EQUAL:
-                    return (T)(Object)(left == right); // TODO: fix dis & belo
+                    return (left == right); // TODO: fix dis & belo
 //< binary-equality
 //> binary-comparison
                 case TokenType.GREATER:
 //> check-greater-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-greater-operand
-                    return (T)(Object)((double) left > (double) right);
+                    return ((double) left > (double) right);
                 case TokenType.GREATER_EQUAL:
 //> check-greater-equal-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-greater-equal-operand
-                    return (T)(Object)((double) left >= (double) right);
+                    return ((double) left >= (double) right);
                 case TokenType.LESS:
 //> check-less-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-less-operand
-                    return (T)(Object)((double) left < (double) right);
+                    return ((double) left < (double) right);
                 case TokenType.LESS_EQUAL:
 //> check-less-equal-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-less-equal-operand
-                    return (T)(Object)((double) left <= (double) right);
+                    return ((double) left <= (double) right);
 //< binary-comparison
                 case TokenType.MINUS:
 //> check-minus-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-minus-operand
-                    return (T)(Object)((double) left - (double) right);
+                    return ((double) left - (double) right);
 //> binary-plus
                 case TokenType.PLUS:
                     if (left is Double && right is Double)
                     {
-                        return (T)(Object)((double) left + (double) right);
+                        return ((double) left + (double) right);
                     } // [plus]
 
                     if (left is String && right is String)
                     {
-                        return (T)(Object)((String) left + (String) right);
+                        return ((String) left + (String) right);
                     }
 
                     break;
@@ -380,12 +380,12 @@ namespace LoxInterpreter
 //> check-slash-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-slash-operand
-                    return (T)(Object)((double) left / (double) right);
+                    return ((double) left / (double) right);
                 case TokenType.STAR:
 //> check-star-operand
                     CheckNumberOperands(expr.op, left, right);
 //< check-star-operand
-                    return (T)(Object)((double) left * (double) right);
+                    return ((double) left * (double) right);
             }
 
             return default;
@@ -398,12 +398,12 @@ namespace LoxInterpreter
 //> Functions Visit-call
 
 
-        public T VisitCallExpr(Expr<T>.Call expr)
+        public Object VisitCallExpr(Expr.Call expr)
         {
             Object callee = Evaluate(expr.callee);
 
             List<object> arguments = new List<object>();
-            foreach (Expr<T> argument in expr.arguments)
+            foreach (Expr argument in expr.arguments)
             {
                 // [in-order]
                 arguments.Add(Evaluate(argument));
@@ -415,7 +415,7 @@ namespace LoxInterpreter
             // }
 
 //< check-is-callable
-            ILoxCallable<T> function = (ILoxCallable<T>) callee;
+            ILoxCallable function = (ILoxCallable) callee;
 //> check-arity
             // if (arguments.Count != function.arity())
             // {
@@ -423,14 +423,14 @@ namespace LoxInterpreter
             // }
 
 //< check-arity
-            return (T)(Object) function.Call(this, arguments); //TODO: fix dis
+            return  function.Call(this, arguments); //TODO: fix dis
         }
 
 //< Functions Visit-call
 //> Classes interpreter-Visit-get
 
 
-        public T VisitGetExpr(Expr<T>.Get expr)
+        public Object VisitGetExpr(Expr.Get expr)
         {
           // Object obj = Evaluate(expr.obj);
           // if (Object is LoxInstance) {
@@ -446,45 +446,45 @@ namespace LoxInterpreter
 //> Visit-grouping
 
 
-        public T VisitGroupingExpr(Expr<T>.Grouping expr)
+        public Object VisitGroupingExpr(Expr.Grouping expr)
         {
-            return (T)(Object)Evaluate(expr.expression); // TODO: fix dis
+            return Evaluate(expr.expression); 
         }
 
 //< Visit-grouping
 //> Visit-literal
 
 
-        public T VisitLiteralExpr(Expr<T>.Literal expr)
+        public Object VisitLiteralExpr(Expr.Literal expr)
         {
-            return (T) expr.value;
+            return  expr.value;
         }
 
 //< Visit-literal
 //> Control Flow Visit-logical
 
 
-        public T VisitLogicalExpr(Expr<T>.Logical expr)
+        public Object VisitLogicalExpr(Expr.Logical expr)
         {
             Object left = Evaluate(expr.left);
 
             if (expr.op.type == TokenType.OR)
             {
-                if (isTruthy(left)) return (T) left;
+                if (isTruthy(left)) return  left;
             }
             else
             {
-                if (!isTruthy(left)) return (T)  left;
+                if (!isTruthy(left)) return   left;
             }
 
-            return (T) Evaluate(expr.right);
+            return  Evaluate(expr.right);
         }
 
 //< Control Flow Visit-logical
 //> Classes interpreter-Visit-set
 
         
-        public T VisitSetExpr(Expr<T>.Set expr)
+        public Object VisitSetExpr(Expr.Set expr)
         {
           // Object o = Evaluate(expr.obj);
           //
@@ -504,7 +504,7 @@ namespace LoxInterpreter
 //> Inheritance interpreter-Visit-super
 
 
-//     public Object VisitSuperExpr(Expr<Stmt<T>>.Super expr)
+//     public Object VisitSuperExpr(Expr<Stmt>.Super expr)
 //     {
 //       int distance = locals.get(expr);
 //       LoxClass superclass = (LoxClass) environment.getAt(
@@ -516,7 +516,7 @@ namespace LoxInterpreter
 // //< super-find-this
 // //> super-find-method
 //
-//       LoxFunction<T> method = superclass.findMethod(expr.method.lexeme);
+//       LoxFunction method = superclass.findMethod(expr.method.lexeme);
 // //> super-no-method
 //
 //       if (method == null)
@@ -534,7 +534,7 @@ namespace LoxInterpreter
 //> Classes interpreter-Visit-this
 
         //
-        // public Object VisitThisExpr(Expr<Stmt<T>>.This expr)
+        // public Object VisitThisExpr(Expr<Stmt>.This expr)
         // {
         //   return lookUpVariable(expr.keyword, expr);
         // }
@@ -543,20 +543,20 @@ namespace LoxInterpreter
 //> Visit-unary
 //     
 //
-    public T VisitUnaryExpr(Expr<T>.Unary expr)
+    public Object VisitUnaryExpr(Expr.Unary expr)
     {
       Object right = Evaluate(expr.right);
 
       switch (expr.op.type) {
 //> unary-bang
         case TokenType.BANG:
-        return (T) (Object)!isTruthy(right);
+        return  !isTruthy(right);
 //< unary-bang
         case TokenType.MINUS:
 //> check-unary-operand
         CheckNumberOperand(expr.op, right);
 //< check-unary-operand
-        return (T)(Object) (-(double) right);
+        return  (-(double) right);
       }
 
       // Unreachable.
@@ -567,26 +567,35 @@ namespace LoxInterpreter
 //> Statements and State Visit-variable
 
 
-        public T VisitVariableExpr(Expr<T>.Variable expr)
+        public Object VisitVariableExpr(Expr.Variable expr)
         {
 /* Statements and State Visit-variable < Resolving and Binding call-look-up-variable
     return environment.get(expr.name);
 */
 //> Resolving and Binding call-look-up-variable
-            return (T) LookUpVariable(expr.name, expr);
+            return  LookUpVariable(expr.name, expr);
 //< Resolving and Binding call-look-up-variable
         }
 
 //> Resolving and Binding look-up-variable
-        Object LookUpVariable(Token name, Expr<T> expr)
+        Object LookUpVariable(Token name, Expr expr)
         {
-            int distance = locals[expr];
-            if (distance != 0)
+            bool keyExists = locals.ContainsKey(expr);
+            int dist;
+            if (keyExists) {
+                dist = locals[expr];
+            }
+            else {
+                //keywords.Add(text, TokenType.IDENTIFIER);
+                dist =  0;
+            }
+            if (dist != 0)
             {
-                return environment.GetAt(distance, name.lexeme);
+                return environment.GetAt(dist, name.lexeme);
             }
             else
             {
+                //return environment.GetAt(dist, name.lexeme);
                 return globals.Get(name);
             }
         }

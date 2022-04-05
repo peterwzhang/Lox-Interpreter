@@ -1,11 +1,12 @@
+using System;
 using System.Threading;
 using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
-    public class LoxFunction<T> : ILoxCallable<T>
+    public class LoxFunction : ILoxCallable
     {
-        private Stmt<T>.Function declaration;
+        private Stmt.Function declaration;
 
         //> closure-field
         private Environment closure;
@@ -20,7 +21,7 @@ namespace LoxInterpreter
         //> Classes is-initializer-field
         private bool isInitializer;
 
-        public LoxFunction(Stmt<T>.Function declaration, Environment closure,
+        public LoxFunction(Stmt.Function declaration, Environment closure,
             bool isInitializer)
         {
             this.isInitializer = isInitializer;
@@ -66,7 +67,7 @@ namespace LoxInterpreter
         //> function-call
 
         //deleted override below
-        public object Call(Interpreter<T> interpreter, List<object> arguments)
+        public object Call(Interpreter interpreter, List<object> arguments)
         {
             /* Functions function-call < Functions call-closure
                 Environment environment = new Environment(interpreter.globals);
@@ -83,20 +84,20 @@ namespace LoxInterpreter
             */
             //> catch-return
             interpreter.ExecuteBlock(declaration.body, environment);
-            // try
-            // {
-            //     interpreter.ExecuteBlock(declaration.body, environment);
-            // }
-            // catch (Stmt<T>.Return returnValue)
-            // {
-            //     //> Classes early-return-this
-            //     if (isInitializer) return closure.getAt(0, "this");
-            //
-            //     //< Classes early-return-this
-            //     return returnValue.value;
-            // }
-            //< catch-return
-            //> Classes return-this
+             try
+             {
+                 interpreter.ExecuteBlock(declaration.body, environment);
+             }
+             catch (Exception returnValue)
+             {
+                 //> Classes early-return-this
+                 if (isInitializer) return closure.GetAt(0, "this");
+            
+                 //< Classes early-return-this
+                 //return Stmt.Return.value; TODO: what dis do
+             }
+            // < catch-return
+            // > Classes return-this
 
             if (isInitializer) return closure.GetAt(0, "this");
             //< Classes return-this

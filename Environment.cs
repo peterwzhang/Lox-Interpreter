@@ -40,6 +40,7 @@ namespace LoxInterpreter
       // throw new RuntimeError(name,
       //   "Undefined variable '" + name.lexeme + "'.");
       return enclosing.Get(name);
+      //return null;
     }
 
     //< environment-get
