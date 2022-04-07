@@ -450,7 +450,7 @@ namespace LoxInterpreter
         {
             for (int i = scopes.Count - 1; i >= 0; i--)
             {
-                if (scopes.ElementAt(i).ContainsKey(name.lexeme))
+                if (scopes.ToArray()[i].ContainsKey(name.lexeme))
                 {
                     interpreter.Resolve(expr, scopes.Count - 1 - i);
                     return;

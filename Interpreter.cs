@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using LoxInterpreter;
 //using LoxInterpreter.Properties;
 using Environment = System.Environment;
@@ -27,8 +28,10 @@ namespace LoxInterpreter
 //> Functions interpreter-constructor
         public Interpreter()
         {
-            //TODO: instance of interface?
+            //TODO: add clock?
             globals.Define("clock", new Clock());
+
+
         }
 
 //< Functions interpreter-constructor
@@ -98,6 +101,7 @@ namespace LoxInterpreter
                     Execute(statement);
                 }
             }
+            //TODO: finally?
             finally
             {
                 this.environment = previous;
@@ -250,9 +254,10 @@ namespace LoxInterpreter
         {
             Object value = null;
             if (stmt.value != null) value = Evaluate(stmt.value);
+            //Console.WriteLine(value);
 
-            //throw new Stmt.Return(value); //! maybe important
-            return default;
+            //return new Return(value); //! maybe important
+            return value;
         }
 
 //< Functions Visit-return
@@ -298,7 +303,7 @@ namespace LoxInterpreter
 //> Resolving and Binding resolved-assign
 
             int distance = locals[expr];
-            if (distance != 0)
+            if (distance >= 0)
             {
                 environment.AssignAt(distance, expr.name, value);
             }
@@ -308,7 +313,7 @@ namespace LoxInterpreter
             }
 
 //< Resolving and Binding resolved-assign
-            return value; // TODO: fix dis
+            return value;
         }
 
 //< Statements and State Visit-assign
@@ -423,7 +428,7 @@ namespace LoxInterpreter
             // }
 
 //< check-arity
-            return  function.Call(this, arguments); //TODO: fix dis
+            return  function.Call(this, arguments);
         }
 
 //< Functions Visit-call
@@ -581,23 +586,17 @@ namespace LoxInterpreter
         Object LookUpVariable(Token name, Expr expr)
         {
             bool keyExists = locals.ContainsKey(expr);
-            int dist;
+            int dist = -1;
             if (keyExists) {
                 dist = locals[expr];
             }
-            else {
-                //keywords.Add(text, TokenType.IDENTIFIER);
-                dist =  0;
-            }
-            if (dist != 0)
+            if (dist  != -1) //   T
             {
                 return environment.GetAt(dist, name.lexeme);
+                
             }
-            else
-            {
-                //return environment.GetAt(dist, name.lexeme);
-                return globals.Get(name);
-            }
+            //return environment.GetAt(dist, name.lexeme);
+            return globals.Get(name);
         }
 
 //< Resolving and Binding look-up-variable
@@ -624,7 +623,7 @@ namespace LoxInterpreter
         private bool isTruthy(Object obj)
         {
             if (obj == null) return false;
-            if (obj is Boolean) return (bool) obj;
+            if (obj is bool) return (bool) obj;
             return true;
         }
 
@@ -644,7 +643,7 @@ namespace LoxInterpreter
         {
             if (obj == null) return "nil";
 
-            if (obj is Double)
+            if (obj is double)
             {
                 String text = obj.ToString();
                 if (text.EndsWith(".0"))
