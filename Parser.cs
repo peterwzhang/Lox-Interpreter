@@ -7,7 +7,7 @@ namespace LoxInterpreter.Properties
     public class Parser
     {
         //< parse-error
-        private List<Token> tokens;
+        private readonly List<Token> tokens;
         private int current = 0;
 
         public Parser(List<Token> tokens)

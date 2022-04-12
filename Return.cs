@@ -7,7 +7,7 @@ namespace LoxInterpreter
         public readonly object value;
 
         public Return(object val) : base()
-        {
+        { 
             this.value = val;
         }
     }

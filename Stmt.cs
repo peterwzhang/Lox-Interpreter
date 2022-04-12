@@ -153,8 +153,8 @@ namespace LoxInterpreter
         return visitor.VisitReturnStmt(this);
       }
 
-      public Token keyword;
-      public Expr value;
+      public readonly Token keyword;
+      public readonly Expr value;
     }
 
 //< stmt-return
@@ -201,3 +201,4 @@ namespace LoxInterpreter
   }
 }
 //< Appendix II stmt
+

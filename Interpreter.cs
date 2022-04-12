@@ -28,7 +28,6 @@ namespace LoxInterpreter
 //> Functions interpreter-constructor
         public Interpreter()
         {
-            //TODO: add clock?
             globals.Define("clock", new Clock());
 
 
@@ -88,13 +87,12 @@ namespace LoxInterpreter
 
 //< Resolving and Binding resolve
 //> Statements and State Execute-block
-        public void ExecuteBlock(List<Stmt> statements,
-            Environment env)
+        public void ExecuteBlock(List<Stmt> statements, Environment env)
         {
-            Environment previous = this.environment;
+            Environment previous = environment;
             try
             {
-                this.environment = env;
+                environment = env;
 
                 foreach (var statement in statements)
                 {
@@ -104,7 +102,7 @@ namespace LoxInterpreter
             //TODO: finally?
             finally
             {
-                this.environment = previous;
+                environment = previous;
             }
         }
 
@@ -242,7 +240,7 @@ namespace LoxInterpreter
             Object value = Evaluate(stmt.expression);
             Console.WriteLine(stringify(value));
             
-            return default;
+            return null;
 
         }
 
@@ -250,13 +248,14 @@ namespace LoxInterpreter
 //> Functions Visit-return
 
 
-        public Object VisitReturnStmt(Stmt.Return stmt)
+        public object VisitReturnStmt(Stmt.Return stmt)
         {
-            Object value = null;
-            if (stmt.value != null) value = Evaluate(stmt.value);
+            object value = null;
+            if (stmt.value != null) 
+                value = Evaluate(stmt.value);
             //Console.WriteLine(value);
 
-            //return new Return(value); //! maybe important
+            throw new Return(value); //! maybe important
             return value;
         }
 
@@ -329,9 +328,9 @@ namespace LoxInterpreter
             {
 //> binary-equality
                 case TokenType.BANG_EQUAL:
-                    return left != right; // TODO: fix dis
+                    return !isEqual(left,right);
                 case TokenType.EQUAL_EQUAL:
-                    return (left == right); // TODO: fix dis & belo
+                    return isEqual(left, right); 
 //< binary-equality
 //> binary-comparison
                 case TokenType.GREATER:
@@ -634,7 +633,7 @@ namespace LoxInterpreter
             if (a == null && b == null) return true;
             if (a == null) return false;
 
-            return a == b;
+            return a.Equals(b);
         }
 
 //< is-equal

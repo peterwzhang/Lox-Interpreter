@@ -83,19 +83,21 @@ namespace LoxInterpreter
                 interpreter.executeBlock(declaration.body, environment);
             */
             //> catch-return
-            interpreter.ExecuteBlock(declaration.body, environment);
+            //interpreter.ExecuteBlock(declaration.body, environment);
              try
              {
                  interpreter.ExecuteBlock(declaration.body, environment);
              }
-             catch (Exception returnValue)
+             catch (Return returnValue)
              {
                  //> Classes early-return-this
-                 if (isInitializer) return closure.GetAt(0, "this");
-            
+                 //if (isInitializer) return closure.GetAt(0, "this");
+             
                  //< Classes early-return-this
-                 //return Stmt.Return.value; TODO: what dis do
+                 //return Stmt.Return.value;
+                 return returnValue.value; 
              }
+             
             // < catch-return
             // > Classes return-this
 
