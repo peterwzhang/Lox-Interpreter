@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using LoxInterpreter;
 
 namespace LoxInterpreter
 {
@@ -10,7 +8,7 @@ namespace LoxInterpreter
         private Interpreter interpreter;
 
 //> scopes-field
-        private Stack<Dictionary<String, bool>> scopes = new Stack<Dictionary<String, bool>>();
+        private readonly List<Dictionary<string, bool>> scopes = new List<Dictionary<string, bool>>();
 
 //< scopes-field
 //> function-type-field
@@ -352,12 +350,11 @@ namespace LoxInterpreter
 
         public Object VisitVariableExpr(Expr.Variable expr)
         {
-            if (scopes.Count != 0 &&
-                !scopes.Peek().ContainsKey(expr.name.lexeme))
-            {
-                // Lox.error(expr.name,
-                //     "Can't read local variable in its own initializer.");
-            }
+            // if (scopes.Count > 0 && scopes[scopes.Count - 1].ContainsKey(expr.name.lexeme))
+            // {
+            //     //if (scopes[scopes.Count - 1][expr.name.lexeme] == false) // declared but not yet defined
+            //         //Lox.error(expr.name, "Cannot read local variable in its own initializer.");
+            // }
 
             resolveLocal(expr, expr.name);
             return null;
@@ -407,23 +404,23 @@ namespace LoxInterpreter
 //> begin-scope
         private void beginScope()
         {
-            scopes.Push(new Dictionary<String, bool>());
+            scopes.Add(new Dictionary<string, bool>());
         }
 
 //< begin-scope
 //> end-scope
         private void endScope()
         {
-            scopes.Pop();
+            scopes.RemoveAt(scopes.Count - 1);
         }
 
 //< end-scope
 //> declare
         private void declare(Token name)
         {
-            if (scopes.Count == 0) return;
+            if (scopes.Count < 1) return;
 
-            Dictionary<String, bool> scope = scopes.Peek();
+            Dictionary<String, bool> scope = scopes[scopes.Count - 1];
 //> duplicate-variable
             if (scope.ContainsKey(name.lexeme))
             {
@@ -439,9 +436,9 @@ namespace LoxInterpreter
 //> define
         private void define(Token name)
         {
-            if (scopes.Count == 0) return;
-            if (scopes.Peek().ContainsKey(name.lexeme)) scopes.Peek()[name.lexeme] = true;
-            else scopes.Peek().Add(name.lexeme, true);
+            if (scopes.Count < 1)
+                return;
+            scopes[scopes.Count - 1][name.lexeme] = true; 
         }
 
 //< define
@@ -450,7 +447,7 @@ namespace LoxInterpreter
         {
             for (int i = scopes.Count - 1; i >= 0; i--)
             {
-                if (scopes.ToArray()[i].ContainsKey(name.lexeme))
+                if (scopes[i].ContainsKey(name.lexeme)) // Csharp doesn't access Stack<> by index (without resorting to Linq), hence used List<> instead
                 {
                     interpreter.Resolve(expr, scopes.Count - 1 - i);
                     return;

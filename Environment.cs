@@ -8,7 +8,7 @@ namespace LoxInterpreter
   public class Environment
   {
     //> enclosing-field
-    private Environment enclosing;
+    public readonly Environment enclosing;
 
     //< enclosing-field
     private Dictionary<string, object> values = new Dictionary<string, object>();
@@ -34,7 +34,8 @@ namespace LoxInterpreter
       }
       //> environment-get-enclosing
 
-      if (enclosing != null) return enclosing.Get(name);
+      if (enclosing != null) 
+        return enclosing.Get(name);
       //< environment-get-enclosing
 
       // throw new RuntimeError(name,
@@ -49,7 +50,7 @@ namespace LoxInterpreter
     {
       if (values.ContainsKey(name.lexeme))
       {
-        values.Add(name.lexeme, value);
+        values[name.lexeme] = value;
         return;
       }
 
@@ -69,7 +70,10 @@ namespace LoxInterpreter
     //> environment-define
     public void Define(string name, object value)
     {
-      values.Add(name, value);
+      if (values.ContainsKey(name))
+        values[name] = value;
+      else
+        values.Add(name, value);
     }
 
     //< environment-define
@@ -96,7 +100,7 @@ namespace LoxInterpreter
     //> Resolving and Binding assign-at
     public void AssignAt(int distance, Token name, object value)
     {
-      Ancestor(distance).values.Add(name.lexeme, value);
+      Ancestor(distance).values[name.lexeme] = value;
     }
 
     //< Resolving and Binding assign-at

@@ -94,14 +94,13 @@ namespace LoxInterpreter
                  //if (isInitializer) return closure.GetAt(0, "this");
              
                  //< Classes early-return-this
-                 //return Stmt.Return.value;
                  return returnValue.value; 
              }
              
             // < catch-return
             // > Classes return-this
 
-            if (isInitializer) return closure.GetAt(0, "this");
+            //if (isInitializer) return closure.GetAt(0, "this");
             //< Classes return-this
             return null;
         }

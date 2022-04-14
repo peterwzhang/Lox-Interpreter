@@ -94,7 +94,7 @@ namespace LoxInterpreter
             {
                 environment = env;
 
-                foreach (var statement in statements)
+                foreach (Stmt statement in statements)
                 {
                     Execute(statement);
                 }
@@ -112,7 +112,7 @@ namespace LoxInterpreter
         public Object VisitBlockStmt(Stmt.Block stmt)
         {
             ExecuteBlock(stmt.statements, new Environment(environment));
-            return default;
+            return null;
         }
 
 //< Statements and State Visit-block
@@ -187,7 +187,7 @@ namespace LoxInterpreter
         {
             Evaluate(stmt.expression);
 
-            return default;
+            return null;
 
         }
 
@@ -204,11 +204,10 @@ namespace LoxInterpreter
     LoxFunction function = new LoxFunction(stmt, environment);
 */
 //> Classes construct-function
-            LoxFunction function = new LoxFunction(stmt, environment,
-                false);
+            LoxFunction function = new LoxFunction(stmt, environment,false);
 //< Classes construct-function
             environment.Define(stmt.name.lexeme, function);
-            return default;
+            return null;
 
         }
 
@@ -227,7 +226,7 @@ namespace LoxInterpreter
                 Execute(stmt.elseBranch);
             }
             
-            return default;
+            return null;
 
         }
 
@@ -272,7 +271,7 @@ namespace LoxInterpreter
             }
 
             environment.Define(stmt.name.lexeme, value);
-            return default;
+            return null;
         }
 
 //< Statements and State Visit-var
@@ -286,7 +285,7 @@ namespace LoxInterpreter
                 Execute(stmt.body);
             }
 
-            return default;
+            return null;
         }
 
 //< Control Flow Visit-while
@@ -301,9 +300,11 @@ namespace LoxInterpreter
 */
 //> Resolving and Binding resolved-assign
 
-            int distance = locals[expr];
-            if (distance >= 0)
+
+            int distance;
+            if (locals.ContainsKey(expr))
             {
+                distance = locals[expr];
                 environment.AssignAt(distance, expr.name, value);
             }
             else
@@ -392,7 +393,7 @@ namespace LoxInterpreter
                     return ((double) left * (double) right);
             }
 
-            return default;
+            return null;
 
             // Unreachable.
 
@@ -443,7 +444,7 @@ namespace LoxInterpreter
           //
           // throw new RuntimeError(expr.name,
           //   "Only instances have properties.");
-          return default;
+          return null;
         }
 
 //< Classes interpreter-Visit-get
@@ -501,7 +502,7 @@ namespace LoxInterpreter
            // Object value = Evaluate(expr.value);
            // ((LoxInstance) o).set(expr.name, value);
           // return value;
-          return default;
+          return null;
         }
 
 //< Classes interpreter-Visit-set
@@ -564,7 +565,7 @@ namespace LoxInterpreter
       }
 
       // Unreachable.
-      return default;
+      return null;
     }
 
 //< Visit-unary
@@ -584,18 +585,16 @@ namespace LoxInterpreter
 //> Resolving and Binding look-up-variable
         Object LookUpVariable(Token name, Expr expr)
         {
-            bool keyExists = locals.ContainsKey(expr);
-            int dist = -1;
-            if (keyExists) {
-                dist = locals[expr];
-            }
-            if (dist  != -1) //   T
+            int distance;
+            if (locals.ContainsKey(expr))
             {
-                return environment.GetAt(dist, name.lexeme);
-                
+                distance = locals[expr];
+                return environment.GetAt(distance, name.lexeme);
             }
-            //return environment.GetAt(dist, name.lexeme);
-            return globals.Get(name);
+            else
+            {
+                return globals.Get(name);
+            }
         }
 
 //< Resolving and Binding look-up-variable
@@ -603,7 +602,8 @@ namespace LoxInterpreter
 //> check-operand
         void CheckNumberOperand(Token op, Object operand)
         {
-            if (operand is Double) return;
+            if (operand is double) 
+                return;
             //throw new RuntimeError(op, "Operand must be a number.");
         }
 
@@ -652,6 +652,16 @@ namespace LoxInterpreter
 
                 return text;
             }
+            
+            if (obj is bool)
+            {
+                if ((bool)obj)
+                    return "true";
+                else
+                    return "false";
+            }
+
+            return obj.ToString();
 
             return obj.ToString();
         }
