@@ -1,0 +1,167 @@
+print "         Testing truthiness...";              //1- truthiness
+print true;
+print !nil;
+print !false;
+
+print "         Testing operands...";                //2- operands
+print 1+1 == 2;
+print 1-1 == 0;
+print 1*1 == 1;
+print 1/1 == 1;
+
+print "         Testing strings...";                 //3- strings
+print "true";
+print "str" + "ing!" == "string!";
+print "cat" != "dog";
+
+print "         Testing different types...";         //4- different types
+print !(1 == "1");
+print !(3.14 == "pi");
+print !(1 == true);
+
+print "         Testing comparisons...";             //5- comparisons
+print (1 < 2);
+print (2 > 1);
+print (1 <= 1);
+print (1 <= 2);
+print (2 >= 2);
+print (2 >= 1);
+print (1 == 1);
+
+print "         Testing and/or...";                  //6- and or 
+print true and true;
+print !(true and false);
+print (true or false);
+print !(false or false);
+
+print "         Testing grouping()...";              //7- Using () for grouping.
+print (1 + 1) == 2;
+print (2 * (6 - (2 + 2))) == 4; 
+
+print "         Testing var...";                     //8- var
+var x;
+x = 1;
+print x == 1;
+var y = "cat";
+print y == "cat";
+var z = 1.5;
+print z == 1.5;
+print x + z == 2.5;
+
+print "         Testing block...";                    //9- block
+var b = 0;
+if(1){
+    b = 1;
+    b = b + 1;
+}
+print b == 2;
+
+print "         Testing control flow...";            //10- control flow
+var cf = 0;
+if (nil) {                                                     //if else
+  cf = cf;
+} else {
+  cf = cf + 1;
+}
+print cf == 1;
+cf = 0;
+while (cf < 10) {                                              //while
+  cf = cf + 1;  
+}
+print cf == 10;
+for (cf = 0; cf < 5; cf = cf + 1) {                            //for
+  cf = cf;
+}
+print cf == 5;
+
+print "         Testing precedence...";              //11- precedence- * has higher precedence than +.      From https://github.com/munificent/craftinginterpreters
+var x;
+x = 2 + 3 * 4; // expect: 14
+print x == 14;
+// * has higher precedence than -.
+x = 20 - 3 * 2; // expect: 14
+print x == 14;
+// / has higher precedence than +.
+x = 12 + 6 / 3; // expect: 14
+print x == 14;
+// / has higher precedence than -.
+x 16 - 6 / 3; // expect: 14
+print x == 14;
+// < has higher precedence than ==.
+print false == 2 < 1; // expect: true
+// > has higher precedence than ==.
+print false == 1 > 2; // expect: true
+// <= has higher precedence than ==.
+print false == 2 <= 1; // expect: true
+// >= has higher precedence than ==.
+print false == 1 >= 2; // expect: true
+
+print "         Testing 1-1 space sensitivity...";   //12-  1 - 1 is not space-sensitive.                 From https://github.com/munificent/craftinginterpreters
+print 0 == 1 - 1; 
+print 0 == 1 -1;  
+print 0 == 1- 1; 
+print 0 == 1-1;   
+
+print "         Testing basic functions...";         //13- basic functions
+fun double(a){
+    return a * 2;
+}
+fun median(a, b, c) {
+    if ((a <= b) and (b <= c)) return b;  
+    if ((a <= c) and (c <= b)) return c;  
+    if ((b <= a) and (a <= c)) return a;  
+    if ((b <= c) and (c <= a)) return c;  
+    if ((c <= a) and (a <= b)) return a;  
+    return b;                            			
+}
+print double(1) == 2;
+print median(1, 3, 2) == 2;
+
+print "         Testing recursive functions...";     //14- recursion
+fun dec(x) {
+    if (x <= 0){
+        return x;
+    } else 
+        return dec(x-1);
+}
+fun factorial(x)
+{
+    if (x == 0)
+        return 1;
+    return x * factorial(x - 1);
+}
+print dec(0) == 0;
+print dec(5) == 0;
+print factorial(3) == 6; //3! = 6
+
+print "         Testing first-class-ness of function...";    //15- first-class-ness of function               From https://github.com/munificent/craftinginterpreters
+fun addPair(a, b) {
+  return a + b;
+}
+fun identity(a) {
+  return a;
+}
+print identity(addPair)(1, 2) == 3;    
+
+print "         Testing function's local function...";       //16- local function of function                 From https://github.com/munificent/craftinginterpreters
+fun outerFunction(x) {  
+  fun localFunction() {
+    return x + 1;
+  }
+  return localFunction();
+}
+print outerFunction(0) == 1;
+
+print "         Testing crazy closure function...";          //17- crazy closure function                     From https://github.com/munificent/craftinginterpreters
+fun returnFunction() {
+  var o = "outside";
+
+  fun inner() {
+    return o;
+  }
+
+  return inner;
+}
+var fn = returnFunction();
+print fn() == "outside";
+

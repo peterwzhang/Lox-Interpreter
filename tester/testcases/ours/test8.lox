@@ -1,0 +1,12 @@
+//var
+var x;
+x = 1;
+print x == 1;
+
+var y = "cat";
+print y == "cat";
+
+var z = 1.5;
+print z == 1.5;
+
+print x + z == 2.5;

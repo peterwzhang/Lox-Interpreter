@@ -1,0 +1,19 @@
+//control flow
+var cf = 0;
+if (nil) {
+  cf;
+} else {
+  cf = cf + 1;
+}
+print cf == 1;
+
+cf = 0;
+while (a <= 10) {
+  cf = cf + 1;
+}
+print cf == 10;
+
+for (cf = 0; cf < 10; cf = cf + 1) {
+  cf;
+}
+print cf == 9;

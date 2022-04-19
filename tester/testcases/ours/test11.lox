@@ -1,0 +1,18 @@
+//From https://github.com/munificent/craftinginterpreters
+// * has higher precedence than +.
+var x;
+x = 2 + 3 * 4; // expect: 14
+print x == 14;
+
+// * has higher precedence than -.
+x = 20 - 3 * 2; // expect: 14
+print x == 14;
+
+// / has higher precedence than +.
+x = 12 + 6 / 3; // expect: 14
+print x == 14;
+
+// / has higher precedence than -.
+x 16 - 6 / 3; // expect: 14
+print x == 14;
+

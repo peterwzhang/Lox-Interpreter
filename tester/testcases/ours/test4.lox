@@ -1,0 +1,4 @@
+//different types
+print !(1 == "1");
+print !(3.14 == "pi");
+print !(1 == true);

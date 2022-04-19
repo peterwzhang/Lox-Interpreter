@@ -1,0 +1,7 @@
+//block
+var b = 0;
+if(1){
+    b = 1;
+    b += 1;
+}
+print b == 2;

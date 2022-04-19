@@ -1,0 +1,5 @@
+//truthiness
+print "Testing truthiness...";              
+print true;
+print !nil;
+print !false;

@@ -1,0 +1,7 @@
+//recursive functions
+fun dec(x) {
+    if (x <= 0){
+        return x;
+    } else 
+        return dec(x-1);
+}

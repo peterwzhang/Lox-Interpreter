@@ -1,0 +1,5 @@
+//basic strings
+print "true";
+print "str" + "ing!" == "string!";
+print "cat" != "dog";
+
