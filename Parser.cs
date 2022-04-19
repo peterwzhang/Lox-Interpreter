@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LoxInterpreter.Properties
 {
@@ -8,7 +7,7 @@ namespace LoxInterpreter.Properties
     {
         //< parse-error
         private readonly List<Token> tokens;
-        private int current = 0;
+        private int current;
 
         public Parser(List<Token> tokens)
         {
@@ -18,16 +17,14 @@ namespace LoxInterpreter.Properties
         //> Statements and State parse
         public List<Stmt> Parse()
         {
-            List<Stmt> statements = new List<Stmt>();
+            var statements = new List<Stmt>();
             while (!isAtEnd())
-            {
                 /* Statements and State parse < Statements and State parse-declaration
-                      statements.Add(statement());
-                */
+                          statements.Add(statement());
+                    */
                 //> parse-declaration
                 statements.Add(declaration());
-                //< parse-declaration
-            }
+            //< parse-declaration
 
             return statements; // [parse-error-handling]
         }
@@ -136,45 +133,33 @@ namespace LoxInterpreter.Properties
             //> for-initializer
             Stmt initializer;
             if (match(TokenType.SEMICOLON))
-            {
                 initializer = null;
-            }
             else if (match(TokenType.VAR))
-            {
                 initializer = varDeclaration();
-            }
             else
-            {
                 initializer = expressionStatement();
-            }
             //< for-initializer
             //> for-condition
 
             Expr condition = null;
-            if (!check(TokenType.SEMICOLON))
-            {
-                condition = expression();
-            }
+            if (!check(TokenType.SEMICOLON)) condition = expression();
 
             consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
             //< for-condition
             //> for-increment
 
             Expr increment = null;
-            if (!check(TokenType.RIGHT_PAREN))
-            {
-                increment = expression();
-            }
+            if (!check(TokenType.RIGHT_PAREN)) increment = expression();
 
             consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
             //< for-increment
             //> for-body
-            Stmt body = statement();
+            var body = statement();
 
             //> for-desugar-increment
             if (increment != null)
             {
-                List<Stmt> tmp = new List<Stmt>();
+                var tmp = new List<Stmt>();
                 tmp.Add(body);
                 tmp.Add(new Stmt.Expression(increment));
                 body = new Stmt.Block(tmp);
@@ -189,7 +174,7 @@ namespace LoxInterpreter.Properties
             //> for-desugar-initializer
             if (initializer != null)
             {
-                List<Stmt> tmp = new List<Stmt>();
+                var tmp = new List<Stmt>();
                 tmp.Add(initializer);
                 tmp.Add(body);
                 body = new Stmt.Block(tmp);
@@ -205,15 +190,12 @@ namespace LoxInterpreter.Properties
         private Stmt ifStatement()
         {
             consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
-            Expr condition = expression();
+            var condition = expression();
             consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition."); // [parens]
 
-            Stmt thenBranch = statement();
+            var thenBranch = statement();
             Stmt elseBranch = null;
-            if (match(TokenType.ELSE))
-            {
-                elseBranch = statement();
-            }
+            if (match(TokenType.ELSE)) elseBranch = statement();
 
             return new Stmt.If(condition, thenBranch, elseBranch);
         }
@@ -222,7 +204,7 @@ namespace LoxInterpreter.Properties
         //> Statements and State parse-print-statement
         private Stmt printStatement()
         {
-            Expr value = expression();
+            var value = expression();
             consume(TokenType.SEMICOLON, "Expect ';' after value.");
             return new Stmt.Print(value);
         }
@@ -231,12 +213,9 @@ namespace LoxInterpreter.Properties
         //> Functions parse-return-statement
         private Stmt returnStatement()
         {
-            Token keyword = previous();
+            var keyword = previous();
             Expr value = null;
-            if (!check(TokenType.SEMICOLON))
-            {
-                value = expression();
-            }
+            if (!check(TokenType.SEMICOLON)) value = expression();
 
             consume(TokenType.SEMICOLON, "Expect ';' after return value.");
             return new Stmt.Return(keyword, value);
@@ -246,13 +225,10 @@ namespace LoxInterpreter.Properties
         //> Statements and State parse-var-declaration
         private Stmt varDeclaration()
         {
-            Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+            var name = consume(TokenType.IDENTIFIER, "Expect variable name.");
 
             Expr initializer = null;
-            if (match(TokenType.EQUAL))
-            {
-                initializer = expression();
-            }
+            if (match(TokenType.EQUAL)) initializer = expression();
 
             consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
             return new Stmt.Var(name, initializer);
@@ -263,9 +239,9 @@ namespace LoxInterpreter.Properties
         private Stmt whileStatement()
         {
             consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
-            Expr condition = expression();
+            var condition = expression();
             consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
-            Stmt body = statement();
+            var body = statement();
 
             return new Stmt.While(condition, body);
         }
@@ -274,7 +250,7 @@ namespace LoxInterpreter.Properties
         //> Statements and State parse-expression-statement
         private Stmt expressionStatement()
         {
-            Expr expr = expression();
+            var expr = expression();
             consume(TokenType.SEMICOLON, "Expect ';' after expression.");
             return new Stmt.Expression(expr);
         }
@@ -283,12 +259,11 @@ namespace LoxInterpreter.Properties
         //> Functions parse-function
         private Stmt.Function function(string kind)
         {
-            Token name = consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
+            var name = consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
             //> parse-parameters
             consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
-            List<Token> parameters = new List<Token>();
+            var parameters = new List<Token>();
             if (!check(TokenType.RIGHT_PAREN))
-            {
                 do
                 {
                     // if (parameters.size() >= 255)
@@ -299,14 +274,13 @@ namespace LoxInterpreter.Properties
                     parameters.Add(
                         consume(TokenType.IDENTIFIER, "Expect parameter name."));
                 } while (match(TokenType.COMMA));
-            }
 
             consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
             //< parse-parameters
             //> parse-body
 
             consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
-            List<Stmt> body = block();
+            var body = block();
             return new Stmt.Function(name, parameters, body);
             //< parse-body
         }
@@ -315,12 +289,9 @@ namespace LoxInterpreter.Properties
         //> Statements and State block
         private List<Stmt> block()
         {
-            List<Stmt> statements = new List<Stmt>();
+            var statements = new List<Stmt>();
 
-            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
-            {
-                statements.Add(declaration());
-            }
+            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) statements.Add(declaration());
 
             consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
             return statements;
@@ -334,23 +305,24 @@ namespace LoxInterpreter.Properties
                 Expr expr = equality();
             */
             //> Control Flow or-in-assignment
-            Expr expr = or();
+            var expr = or();
             //< Control Flow or-in-assignment
 
             if (match(TokenType.EQUAL))
             {
-                Token equals = previous();
-                Expr value = assignment();
+                var equals = previous();
+                var value = assignment();
 
                 if (expr is Expr.Variable)
                 {
-                    Token name = ((Expr.Variable) expr).name;
+                    var name = ((Expr.Variable) expr).name;
                     return new Expr.Assign(name, value);
                     //> Classes assign-set
                 }
-                else if (expr is Expr.Get)
+
+                if (expr is Expr.Get)
                 {
-                    Expr.Get get = (Expr.Get) expr;
+                    var get = (Expr.Get) expr;
                     return new Expr.Set(get.obj, get.name, value);
                     //< Classes assign-set
                 }
@@ -365,12 +337,12 @@ namespace LoxInterpreter.Properties
         //> Control Flow or
         private Expr or()
         {
-            Expr expr = and();
+            var expr = and();
 
             while (match(TokenType.OR))
             {
-                Token op = previous();
-                Expr right = and();
+                var op = previous();
+                var right = and();
                 expr = new Expr.Logical(expr, op, right);
             }
 
@@ -381,12 +353,12 @@ namespace LoxInterpreter.Properties
         //> Control Flow and
         private Expr and()
         {
-            Expr expr = equality();
+            var expr = equality();
 
             while (match(TokenType.AND))
             {
-                Token op = previous();
-                Expr right = equality();
+                var op = previous();
+                var right = equality();
                 expr = new Expr.Logical(expr, op, right);
             }
 
@@ -397,12 +369,12 @@ namespace LoxInterpreter.Properties
         //> equality
         private Expr equality()
         {
-            Expr expr = comparison();
+            var expr = comparison();
 
             while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL))
             {
-                Token op = previous();
-                Expr right = comparison();
+                var op = previous();
+                var right = comparison();
                 expr = new Expr.Binary(expr, op, right);
             }
 
@@ -413,12 +385,12 @@ namespace LoxInterpreter.Properties
         //> comparison
         private Expr comparison()
         {
-            Expr expr = term();
+            var expr = term();
 
             while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL))
             {
-                Token op = previous();
-                Expr right = term();
+                var op = previous();
+                var right = term();
                 expr = new Expr.Binary(expr, op, right);
             }
 
@@ -429,12 +401,12 @@ namespace LoxInterpreter.Properties
         //> term
         private Expr term()
         {
-            Expr expr = factor();
+            var expr = factor();
 
             while (match(TokenType.MINUS, TokenType.PLUS))
             {
-                Token op = previous();
-                Expr right = factor();
+                var op = previous();
+                var right = factor();
                 expr = new Expr.Binary(expr, op, right);
             }
 
@@ -445,12 +417,12 @@ namespace LoxInterpreter.Properties
         //> factor
         private Expr factor()
         {
-            Expr expr = unary();
+            var expr = unary();
 
             while (match(TokenType.SLASH, TokenType.STAR))
             {
-                Token op = previous();
-                Expr right = unary();
+                var op = previous();
+                var right = unary();
                 expr = new Expr.Binary(expr, op, right);
             }
 
@@ -463,8 +435,8 @@ namespace LoxInterpreter.Properties
         {
             if (match(TokenType.BANG, TokenType.MINUS))
             {
-                Token op = previous();
-                Expr right = unary();
+                var op = previous();
+                var right = unary();
                 return new Expr.Unary(op, right);
             }
 
@@ -480,9 +452,8 @@ namespace LoxInterpreter.Properties
         //> Functions finish-call
         private Expr finishCall(Expr callee)
         {
-            List<Expr> arguments = new List<Expr>();
+            var arguments = new List<Expr>();
             if (!check(TokenType.RIGHT_PAREN))
-            {
                 do
                 {
                     //> check-max-arity
@@ -494,9 +465,8 @@ namespace LoxInterpreter.Properties
                     //< check-max-arity
                     arguments.Add(expression());
                 } while (match(TokenType.COMMA));
-            }
 
-            Token paren = consume(TokenType.RIGHT_PAREN,
+            var paren = consume(TokenType.RIGHT_PAREN,
                 "Expect ')' after arguments.");
 
             return new Expr.Call(callee, paren, arguments);
@@ -506,10 +476,9 @@ namespace LoxInterpreter.Properties
         //> Functions call
         public Expr Call()
         {
-            Expr expr = primary();
+            var expr = primary();
 
             while (true)
-            {
                 // [while-true]
                 if (match(TokenType.LEFT_PAREN))
                 {
@@ -518,7 +487,7 @@ namespace LoxInterpreter.Properties
                 }
                 else if (match(TokenType.DOT))
                 {
-                    Token name = consume(TokenType.IDENTIFIER,
+                    var name = consume(TokenType.IDENTIFIER,
                         "Expect property name after '.'.");
                     expr = new Expr.Get(expr, name);
                     //< Classes parse-property
@@ -527,7 +496,6 @@ namespace LoxInterpreter.Properties
                 {
                     break;
                 }
-            }
 
             return expr;
         }
@@ -540,10 +508,7 @@ namespace LoxInterpreter.Properties
             if (match(TokenType.TRUE)) return new Expr.Literal(true);
             if (match(TokenType.NIL)) return new Expr.Literal(null);
 
-            if (match(TokenType.NUMBER, TokenType.STRING))
-            {
-                return new Expr.Literal(previous().literal);
-            }
+            if (match(TokenType.NUMBER, TokenType.STRING)) return new Expr.Literal(previous().literal);
             //> Inheritance parse-super
 
             // if (match(TokenType.SUPER))
@@ -558,19 +523,16 @@ namespace LoxInterpreter.Properties
             // //> Classes parse-this
             //
             // if (match(TokenType.THIS)) return new Expr.This(previous());
-            
+
             //< Classes parse-this
             //> Statements and State parse-identifier
 
-            if (match(TokenType.IDENTIFIER))
-            {
-                return new Expr.Variable(previous());
-            }
+            if (match(TokenType.IDENTIFIER)) return new Expr.Variable(previous());
             //< Statements and State parse-identifier
 
             if (match(TokenType.LEFT_PAREN))
             {
-                Expr expr = expression();
+                var expr = expression();
                 consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
@@ -587,14 +549,12 @@ namespace LoxInterpreter.Properties
         //> match
         private bool match(params TokenType[] types)
         {
-            foreach (TokenType type in types)
-            {
+            foreach (var type in types)
                 if (check(type))
                 {
                     advance();
                     return true;
                 }
-            }
 
             return false;
         }

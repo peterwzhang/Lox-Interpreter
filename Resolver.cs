@@ -1,71 +1,27 @@
-using System;
 using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
-    public class Resolver : Expr.IVisitor<Object>, Stmt.IVisitor<Object>
+    public class Resolver : Expr.IVisitor<object>, Stmt.IVisitor<object>
     {
-        private Interpreter interpreter;
-
 //> scopes-field
         private readonly List<Dictionary<string, bool>> scopes = new List<Dictionary<string, bool>>();
 
 //< scopes-field
 //> function-type-field
         private FunctionType currentFunction = FunctionType.NONE;
+
+        private readonly Interpreter interpreter;
 //< function-type-field
 
         public Resolver(Interpreter interpreter)
         {
             this.interpreter = interpreter;
         }
-
-//> function-type
-        private enum FunctionType
-        {
-            NONE,
-
-/* Resolving and Binding function-type < Classes function-type-method
-    FUNCTION
-*/
-//> Classes function-type-method
-            FUNCTION,
-
-//> function-type-initializer
-            INITIALIZER,
-//< functio   n-type-initializer
-            //METHOD
-//< Classes function-type-method
-        }
-//< function-type
-//> Classes class-type
-
-//   private enum ClassType {
-//     NONE,
-// /* Classes class-type < Inheritance class-type-subclass
-//     CLASS
-//  */
-// //> Inheritance class-type-subclass
-//     CLASS,
-//     SUBCLASS
-// //< Inheritance class-type-subclass
-//   }
-//
-//   private ClassType currentClass = ClassType.NONE;
-
-//< Classes class-type
-//> resolve-statements
-        public void resolve(List<Stmt> statements)
-        {
-            foreach (Stmt statement in statements)
-            {
-                resolve(statement);
-            }
-        }
 //< resolve-statements
 //> Visit-block-stmt
 
-        public Object VisitBlockStmt(Stmt.Block stmt)
+        public object VisitBlockStmt(Stmt.Block stmt)
         {
             beginScope();
             resolve(stmt.statements);
@@ -142,7 +98,7 @@ namespace LoxInterpreter
 // //< Classes resolver-Visit-class
 // //> Visit-expression-stmt
 
-        public Object VisitExpressionStmt(Stmt.Expression stmt)
+        public object VisitExpressionStmt(Stmt.Expression stmt)
         {
             resolve(stmt.expression);
             return null;
@@ -150,7 +106,7 @@ namespace LoxInterpreter
 //< Visit-expression-stmt
 //> Visit-function-stmt
 
-        public Object VisitFunctionStmt(Stmt.Function stmt)
+        public object VisitFunctionStmt(Stmt.Function stmt)
         {
             declare(stmt.name);
             define(stmt.name);
@@ -166,7 +122,7 @@ namespace LoxInterpreter
 //< Visit-function-stmt
 //> Visit-if-stmt
 
-        public Object VisitIfStmt(Stmt.If stmt)
+        public object VisitIfStmt(Stmt.If stmt)
         {
             resolve(stmt.condition);
             resolve(stmt.thenBranch);
@@ -176,7 +132,7 @@ namespace LoxInterpreter
 //< Visit-if-stmt
 //> Visit-print-stmt
 
-        public Object VisitPrintStmt(Stmt.Print stmt)
+        public object VisitPrintStmt(Stmt.Print stmt)
         {
             resolve(stmt.expression);
             return null;
@@ -184,7 +140,7 @@ namespace LoxInterpreter
 //< Visit-print-stmt
 //> Visit-return-stmt
 
-        public Object VisitReturnStmt(Stmt.Return stmt)
+        public object VisitReturnStmt(Stmt.Return stmt)
         {
 //> return-from-top
             if (currentFunction == FunctionType.NONE)
@@ -211,13 +167,10 @@ namespace LoxInterpreter
 //< Visit-return-stmt
 //> Visit-var-stmt
 
-        public Object VisitVarStmt(Stmt.Var stmt)
+        public object VisitVarStmt(Stmt.Var stmt)
         {
             declare(stmt.name);
-            if (stmt.initializer != null)
-            {
-                resolve(stmt.initializer);
-            }
+            if (stmt.initializer != null) resolve(stmt.initializer);
 
             define(stmt.name);
             return null;
@@ -225,7 +178,7 @@ namespace LoxInterpreter
 //< Visit-var-stmt
 //> Visit-while-stmt
 
-        public Object VisitWhileStmt(Stmt.While stmt)
+        public object VisitWhileStmt(Stmt.While stmt)
         {
             resolve(stmt.condition);
             resolve(stmt.body);
@@ -234,7 +187,7 @@ namespace LoxInterpreter
 //< Visit-while-stmt
 //> Visit-assign-expr
 
-        public Object VisitAssignExpr(Expr.Assign expr)
+        public object VisitAssignExpr(Expr.Assign expr)
         {
             resolve(expr.value);
             resolveLocal(expr, expr.name);
@@ -243,7 +196,7 @@ namespace LoxInterpreter
 //< Visit-assign-expr
 //> Visit-binary-expr
 
-        public Object VisitBinaryExpr(Expr.Binary expr)
+        public object VisitBinaryExpr(Expr.Binary expr)
         {
             resolve(expr.left);
             resolve(expr.right);
@@ -252,21 +205,18 @@ namespace LoxInterpreter
 //< Visit-binary-expr
 //> Visit-call-expr
 
-        public Object VisitCallExpr(Expr.Call expr)
+        public object VisitCallExpr(Expr.Call expr)
         {
             resolve(expr.callee);
 
-            foreach (Expr argument in expr.arguments)
-            {
-                resolve(argument);
-            }
+            foreach (var argument in expr.arguments) resolve(argument);
 
             return null;
         }
 //< Visit-call-expr
 //> Classes resolver-Visit-get
 
-        public Object VisitGetExpr(Expr.Get expr)
+        public object VisitGetExpr(Expr.Get expr)
         {
             resolve(expr.obj);
             return null;
@@ -274,7 +224,7 @@ namespace LoxInterpreter
 //< Classes resolver-Visit-get
 //> Visit-grouping-expr
 
-        public Object VisitGroupingExpr(Expr.Grouping expr)
+        public object VisitGroupingExpr(Expr.Grouping expr)
         {
             resolve(expr.expression);
             return null;
@@ -282,14 +232,14 @@ namespace LoxInterpreter
 //< Visit-grouping-expr
 //> Visit-literal-expr
 
-        public Object VisitLiteralExpr(Expr.Literal expr)
+        public object VisitLiteralExpr(Expr.Literal expr)
         {
             return null;
         }
 //< Visit-literal-expr
 //> Visit-logical-expr
 
-        public Object VisitLogicalExpr(Expr.Logical expr)
+        public object VisitLogicalExpr(Expr.Logical expr)
         {
             resolve(expr.left);
             resolve(expr.right);
@@ -298,7 +248,7 @@ namespace LoxInterpreter
 //< Visit-logical-expr
 //> Classes resolver-Visit-set
 
-        public Object VisitSetExpr(Expr.Set expr)
+        public object VisitSetExpr(Expr.Set expr)
         {
             resolve(expr.value);
             resolve(expr.obj);
@@ -340,7 +290,7 @@ namespace LoxInterpreter
 // //< Classes resolver-Visit-this
 // //> Visit-unary-expr
 
-        public Object VisitUnaryExpr(Expr.Unary expr)
+        public object VisitUnaryExpr(Expr.Unary expr)
         {
             resolve(expr.right);
             return null;
@@ -348,7 +298,7 @@ namespace LoxInterpreter
 //< Visit-unary-expr
 //> Visit-variable-expr
 
-        public Object VisitVariableExpr(Expr.Variable expr)
+        public object VisitVariableExpr(Expr.Variable expr)
         {
             // if (scopes.Count > 0 && scopes[scopes.Count - 1].ContainsKey(expr.name.lexeme))
             // {
@@ -358,6 +308,28 @@ namespace LoxInterpreter
 
             resolveLocal(expr, expr.name);
             return null;
+        }
+//< function-type
+//> Classes class-type
+
+//   private enum ClassType {
+//     NONE,
+// /* Classes class-type < Inheritance class-type-subclass
+//     CLASS
+//  */
+// //> Inheritance class-type-subclass
+//     CLASS,
+//     SUBCLASS
+// //< Inheritance class-type-subclass
+//   }
+//
+//   private ClassType currentClass = ClassType.NONE;
+
+//< Classes class-type
+//> resolve-statements
+        public void resolve(List<Stmt> statements)
+        {
+            foreach (var statement in statements) resolve(statement);
         }
 
 //< Visit-variable-expr
@@ -382,12 +354,12 @@ namespace LoxInterpreter
 //> set-current-function
         private void resolveFunction(Stmt.Function function, FunctionType type)
         {
-            FunctionType enclosingFunction = currentFunction;
+            var enclosingFunction = currentFunction;
             currentFunction = type;
 
 //< set-current-function
             beginScope();
-            foreach (Token param in function.parms)
+            foreach (var param in function.parms)
             {
                 declare(param);
                 define(param);
@@ -420,7 +392,7 @@ namespace LoxInterpreter
         {
             if (scopes.Count < 1) return;
 
-            Dictionary<String, bool> scope = scopes[scopes.Count - 1];
+            var scope = scopes[scopes.Count - 1];
 //> duplicate-variable
             if (scope.ContainsKey(name.lexeme))
             {
@@ -438,21 +410,38 @@ namespace LoxInterpreter
         {
             if (scopes.Count < 1)
                 return;
-            scopes[scopes.Count - 1][name.lexeme] = true; 
+            scopes[scopes.Count - 1][name.lexeme] = true;
         }
 
 //< define
 //> resolve-local
         private void resolveLocal(Expr expr, Token name)
         {
-            for (int i = scopes.Count - 1; i >= 0; i--)
-            {
-                if (scopes[i].ContainsKey(name.lexeme)) // Csharp doesn't access Stack<> by index (without resorting to Linq), hence used List<> instead
+            for (var i = scopes.Count - 1; i >= 0; i--)
+                if (scopes[i].ContainsKey(name
+                        .lexeme)) // Csharp doesn't access Stack<> by index (without resorting to Linq), hence used List<> instead
                 {
                     interpreter.Resolve(expr, scopes.Count - 1 - i);
                     return;
                 }
-            }
+        }
+
+//> function-type
+        private enum FunctionType
+        {
+            NONE,
+
+/* Resolving and Binding function-type < Classes function-type-method
+    FUNCTION
+*/
+//> Classes function-type-method
+            FUNCTION,
+
+//> function-type-initializer
+            INITIALIZER
+            //< functio   n-type-initializer
+            //METHOD
+//< Classes function-type-method
         }
     }
 }

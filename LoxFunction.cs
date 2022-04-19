@@ -1,15 +1,12 @@
-using System;
-using System.Threading;
 using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
     public class LoxFunction : ILoxCallable
     {
-        private Stmt.Function declaration;
-
         //> closure-field
-        private Environment closure;
+        private readonly Environment closure;
+        private readonly Stmt.Function declaration;
 
         //< closure-field
         /* Functions lox-function < Functions closure-constructor
@@ -30,6 +27,56 @@ namespace LoxInterpreter
             this.closure = closure;
             //< closure-constructor
             this.declaration = declaration;
+        }
+
+        //< function-to-string
+        //> function-arity
+
+        //deleted override below
+        public int Arity()
+        {
+            return declaration.parms.Count;
+        }
+
+        //< function-arity
+        //> function-call
+
+        //deleted override below
+        public object Call(Interpreter interpreter, List<object> arguments)
+        {
+            /* Functions function-call < Functions call-closure
+                Environment environment = new Environment(interpreter.globals);
+            */
+            //> call-closure
+            var environment = new Environment(closure);
+            //< call-closure
+            for (var i = 0; i < declaration.parms.Count; i++)
+                environment.Define(declaration.parms[i].lexeme, arguments[i]);
+
+            /* Functions function-call < Functions catch-return
+                interpreter.executeBlock(declaration.body, environment);
+            */
+            //> catch-return
+            //interpreter.ExecuteBlock(declaration.body, environment);
+            try
+            {
+                interpreter.ExecuteBlock(declaration.body, environment);
+            }
+            catch (Return returnValue)
+            {
+                //> Classes early-return-this
+                //if (isInitializer) return closure.GetAt(0, "this");
+
+                //< Classes early-return-this
+                return returnValue.value;
+            }
+
+            // < catch-return
+            // > Classes return-this
+
+            //if (isInitializer) return closure.GetAt(0, "this");
+            //< Classes return-this
+            return null;
         }
         //
         // //> Classes bind-instance
@@ -52,57 +99,6 @@ namespace LoxInterpreter
         public override string ToString()
         {
             return "<fn " + declaration.name.lexeme + ">";
-        }
-
-        //< function-to-string
-        //> function-arity
-        
-        //deleted override below
-        public int Arity()
-        {
-            return declaration.parms.Count;
-        }
-
-        //< function-arity
-        //> function-call
-
-        //deleted override below
-        public object Call(Interpreter interpreter, List<object> arguments)
-        {
-            /* Functions function-call < Functions call-closure
-                Environment environment = new Environment(interpreter.globals);
-            */
-            //> call-closure
-            Environment environment = new Environment(closure);
-            //< call-closure
-            for (int i = 0; i < declaration.parms.Count; i++) {
-                environment.Define(declaration.parms[i].lexeme, arguments[i]);
-            }
-
-            /* Functions function-call < Functions catch-return
-                interpreter.executeBlock(declaration.body, environment);
-            */
-            //> catch-return
-            //interpreter.ExecuteBlock(declaration.body, environment);
-             try
-             {
-                 interpreter.ExecuteBlock(declaration.body, environment);
-             }
-             catch (Return returnValue)
-             {
-                 //> Classes early-return-this
-                 //if (isInitializer) return closure.GetAt(0, "this");
-             
-                 //< Classes early-return-this
-                 return returnValue.value; 
-             }
-             
-            // < catch-return
-            // > Classes return-this
-
-            //if (isInitializer) return closure.GetAt(0, "this");
-            //< Classes return-this
-            return null;
         }
         //< function-call
     }

@@ -1,11 +1,12 @@
-using System;
 using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
     public class Scanner
     {
-        private Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
+        private int current;
+
+        private readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
         {
             {
                 "and", TokenType.AND
@@ -57,16 +58,15 @@ namespace LoxInterpreter
             }
         };
 
-//< keyword-map
-        private string source;
+        private int line = 1;
 
-        private List<Token> tokens = new List<Token>();
+//< keyword-map
+        private readonly string source;
 
 //> scan-state
-        private int start = 0;
-        private int current = 0;
+        private int start;
 
-        private int line = 1;
+        private readonly List<Token> tokens = new List<Token>();
 //< scan-state
 
         public Scanner(string source)
@@ -92,7 +92,7 @@ namespace LoxInterpreter
 //> scan-token
         private void scanToken()
         {
-            char c = advance();
+            var c = advance();
             switch (c)
             {
                 case '(':
@@ -142,14 +142,11 @@ namespace LoxInterpreter
                 //> slash
                 case '/':
                     if (match('/'))
-                    {
                         // A comment goes until the end of the line.
-                        while (peek() != '\n' && !isAtEnd()) advance();
-                    }
+                        while (peek() != '\n' && !isAtEnd())
+                            advance();
                     else
-                    {
                         addToken(TokenType.SLASH);
-                    }
 
                     break;
                 //< slash
@@ -188,10 +185,6 @@ namespace LoxInterpreter
                         identifier();
 //< identifier-start
                     }
-                    else
-                    {
-                        //Lox.error(line, "Unexpected character.");
-                    }
 
 //< digit-start
                     break;
@@ -209,16 +202,13 @@ namespace LoxInterpreter
     addToken(IDENTIFIER);
 */
 //> keyword-type
-            String text = source.Substring(start, current - start);
-            bool keyExists = keywords.ContainsKey(text);
+            var text = source.Substring(start, current - start);
+            var keyExists = keywords.ContainsKey(text);
             TokenType type;
-            if (keyExists) {
+            if (keyExists)
                 type = keywords[text];
-            }
-            else {
-                //keywords.Add(text, TokenType.IDENTIFIER);
-                type =  TokenType.IDENTIFIER;
-            }
+            else //keywords.Add(text, TokenType.IDENTIFIER);
+                type = TokenType.IDENTIFIER;
             addToken(type);
 //< keyword-type
         }
@@ -239,12 +229,13 @@ namespace LoxInterpreter
             }
 
             addToken(TokenType.NUMBER,
-                Double.Parse(source.Substring(start, current - start)));
+                double.Parse(source.Substring(start, current - start)));
         }
 
 //< number
 //> string
-        private void String() {
+        private void String()
+        {
             while (peek() != '"' && !isAtEnd())
             {
                 if (peek() == '\n') line++;
@@ -252,16 +243,14 @@ namespace LoxInterpreter
             }
 
             if (isAtEnd())
-            {
                 //Lox.error(line, "Unterminated string.");
                 return;
-            }
 
             // The closing ".
             advance();
 
             // Trim the surrounding quotes.
-            String value = source.Substring(start + 1, current - start - 2);
+            var value = source.Substring(start + 1, current - start - 2);
             addToken(TokenType.STRING, value);
         }
 
@@ -296,8 +285,8 @@ namespace LoxInterpreter
 //> is-alpha
         private bool isAlpha(char c)
         {
-            return (c >= 'a' && c <= 'z') ||
-                   (c >= 'A' && c <= 'Z') ||
+            return c >= 'a' && c <= 'z' ||
+                   c >= 'A' && c <= 'Z' ||
                    c == '_';
         }
 
@@ -332,9 +321,9 @@ namespace LoxInterpreter
             addToken(type, null);
         }
 
-        private void addToken(TokenType type, Object literal)
+        private void addToken(TokenType type, object literal)
         {
-            String text = source.Substring(start, current - start);
+            var text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
 //< advance-and-add-token

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace LoxInterpreter
@@ -10,6 +9,6 @@ namespace LoxInterpreter
         int Arity();
 
 //< callable-arity
-        Object Call(Interpreter interpreter, List<Object> arguments);
+        object Call(Interpreter interpreter, List<object> arguments);
     }
 }

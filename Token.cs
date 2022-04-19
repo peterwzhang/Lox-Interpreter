@@ -1,15 +1,13 @@
-using System;
-
 namespace LoxInterpreter
 {
     public class Token
     {
-        public TokenType type;
         public string lexeme;
-        public Object literal;
         public int line; // [location]
+        public object literal;
+        public TokenType type;
 
-        public Token(TokenType type, String lexeme, Object literal, int line)
+        public Token(TokenType type, string lexeme, object literal, int line)
         {
             this.type = type;
             this.lexeme = lexeme;
