@@ -40,7 +40,7 @@ namespace LoxInterpreter
         // evaluates function statements
         public object VisitFunctionStmt(Stmt.Function stmt)
         {
-            var function = new LoxFunction(stmt, environment, false);
+            var function = new LoxFunction(stmt, environment);
             environment.Define(stmt.name.lexeme, function);
             return null;
         }
@@ -68,8 +68,8 @@ namespace LoxInterpreter
         public object VisitReturnStmt(Stmt.Return stmt)
         {
             object value = null;
-            if (stmt.value != null)
-                value = Evaluate(stmt.value);
+            if (stmt.Value != null)
+                value = Evaluate(stmt.Value);
 
             throw new Return(value);
         }
@@ -126,20 +126,20 @@ namespace LoxInterpreter
                     return IsEqual(left, right);
                 // comparison operators
                 case TokenType.GREATER:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left > (double) right;
                 case TokenType.GREATER_EQUAL:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left >= (double) right;
                 case TokenType.LESS:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left < (double) right;
                 case TokenType.LESS_EQUAL:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left <= (double) right;
                 // arithmetic binary operators
                 case TokenType.MINUS:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left - (double) right;
                 case TokenType.PLUS:
                     // handles that + can be used to concatenate strings or add numbers
@@ -147,10 +147,10 @@ namespace LoxInterpreter
                     if (left is string && right is string) return (string) left + (string) right;
                     break;
                 case TokenType.SLASH:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left / (double) right;
                 case TokenType.STAR:
-                    CheckNumberOperands(expr.op, left, right);
+                    CheckNumberOperands(left, right);
                     return (double) left * (double) right;
             }
 
@@ -224,7 +224,7 @@ namespace LoxInterpreter
                 case TokenType.BANG:
                     return !IsTruthy(right);
                 case TokenType.MINUS:
-                    CheckNumberOperand(expr.op, right);
+                    CheckNumberOperand(right);
                     return -(double) right;
             }
 
@@ -279,7 +279,6 @@ namespace LoxInterpreter
 
                 foreach (var statement in statements) Execute(statement);
             }
-            //TODO: finally?
             finally
             {
                 environment = previous;
@@ -300,15 +299,14 @@ namespace LoxInterpreter
         }
 
         // checks the operand type for unary expressions
-        private void CheckNumberOperand(Token op, object operand)
+        private void CheckNumberOperand(object operand)
         {
             if (operand is double)
                 return;
         }
 
         // checks the operand type for binary expressions
-        private void CheckNumberOperands(Token op,
-            object left, object right)
+        private void CheckNumberOperands(object left, object right)
         {
             if (left is double && right is double) return;
         }
