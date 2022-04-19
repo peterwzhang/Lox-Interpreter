@@ -159,15 +159,42 @@
             <p>
               Although C# and Java were similar languages, there were still
               quite a few differences, and some of these caused us to have to
-              make some selective design choices. The first major difference
-              that is seen in every file is since we are using C#, we decided to
-              follow
+              make some selective design choices, such as:
+              <ul>
+                <li>Following C# coding conventions such as using PascalCasing when
+                   naming a class or struct, beginning interface names with "I," using
+                   implicit typing for local variables when possible, capitalizing method names, 
+                   and using try-catch for most exception handling.</li>
+                <li>Using a List in place of a Stack to implement scopes to resolve statements</li>
+                <li>Using a Dictionary in place of a HashMap</li> 
+                <li>Using "readonly" for immutable variables in place of "final"</li>
+                <li>Using namespaces in place of packages</li>
+                <li>Using "foreach" loops</li>
+              </ul>  
               <a
                 href="https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions"
                 >C#'s naming convention</a
               > with some of our own changes.
             </p>
             <h4>Implementation of Code</h4>
+            <p>
+              To implement this code, we met as a group many times until the
+              project was complete. We used a pair programming approach by having one 
+              group member broadcast their screen onto a TV in a group study room in Gorgas. 
+              We implemented the interpreter in the same order that Crafting Interpreters 
+              implements jlox. This provided us with a recipe for the interpreter and a more 
+              detailed guide to the lox language. We used Rider as our IDE because it's more 
+              compatible with C#. Furthermore, we used Rider's debugger as our main tool to fix our project, 
+              since it provided a detailed stack trace that's capable of showing the value of 
+              every variable during every step of the project's execution. This was especially 
+              helpful when fixing our Environment class, since we could see the exact contents 
+              of an environment during any point of execution. Debugging dominated the total 
+              time spent working on this project. The bug we spent the longest time squashing 
+              was the evaluation of return statements. Our program would simply return a value 
+              when evaluating a return statement, instead of jumping forward to the original 
+              function call. To correct this, we used exceptions to throw the evaluated Return value 
+              and catch it in the LoxFunction class where the function is originally called.
+            </p>
             <p></p>
           </div>
           <p></p>
