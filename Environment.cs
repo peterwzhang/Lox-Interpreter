@@ -49,10 +49,7 @@ namespace LoxInterpreter
             }
 
             //> environment-assign-enclosing
-            if (enclosing != null)
-            {
-                enclosing.Assign(name, value);
-            }
+            if (enclosing != null) enclosing.Assign(name, value);
 
             //< environment-assign-enclosing
             // throw new RuntimeError(name,

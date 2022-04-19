@@ -4,8 +4,6 @@ namespace LoxInterpreter
 {
     public class Scanner
     {
-        private int current;
-
         private readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
         {
             {
@@ -58,15 +56,16 @@ namespace LoxInterpreter
             }
         };
 
-        private int line = 1;
-
 //< keyword-map
         private readonly string source;
 
+        private readonly List<Token> tokens = new List<Token>();
+        private int current;
+
+        private int line = 1;
+
 //> scan-state
         private int start;
-
-        private readonly List<Token> tokens = new List<Token>();
 //< scan-state
 
         public Scanner(string source)
@@ -75,13 +74,13 @@ namespace LoxInterpreter
         }
 
 //> scan-tokens
-        public List<Token> scanTokens()
+        public List<Token> ScanTokens()
         {
-            while (!isAtEnd())
+            while (!IsAtEnd())
             {
                 // We are at the beginning of the next lexeme.
                 start = current;
-                scanToken();
+                ScanToken();
             }
 
             tokens.Add(new Token(TokenType.EOF, "", null, line));
@@ -90,63 +89,63 @@ namespace LoxInterpreter
 
 //< scan-tokens
 //> scan-token
-        private void scanToken()
+        private void ScanToken()
         {
-            var c = advance();
+            var c = Advance();
             switch (c)
             {
                 case '(':
-                    addToken(TokenType.LEFT_PAREN);
+                    AddToken(TokenType.LEFT_PAREN);
                     break;
                 case ')':
-                    addToken(TokenType.RIGHT_PAREN);
+                    AddToken(TokenType.RIGHT_PAREN);
                     break;
                 case '{':
-                    addToken(TokenType.LEFT_BRACE);
+                    AddToken(TokenType.LEFT_BRACE);
                     break;
                 case '}':
-                    addToken(TokenType.RIGHT_BRACE);
+                    AddToken(TokenType.RIGHT_BRACE);
                     break;
                 case ',':
-                    addToken(TokenType.COMMA);
+                    AddToken(TokenType.COMMA);
                     break;
                 case '.':
-                    addToken(TokenType.DOT);
+                    AddToken(TokenType.DOT);
                     break;
                 case '-':
-                    addToken(TokenType.MINUS);
+                    AddToken(TokenType.MINUS);
                     break;
                 case '+':
-                    addToken(TokenType.PLUS);
+                    AddToken(TokenType.PLUS);
                     break;
                 case ';':
-                    addToken(TokenType.SEMICOLON);
+                    AddToken(TokenType.SEMICOLON);
                     break;
                 case '*':
-                    addToken(TokenType.STAR);
+                    AddToken(TokenType.STAR);
                     break; // [slash]
 //> two-char-tokens
                 case '!':
-                    addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+                    AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
                 case '=':
-                    addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                    AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
                     break;
                 case '<':
-                    addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                    AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
                     break;
                 case '>':
-                    addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                    AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                     break;
                 //< two-char-tokens
                 //> slash
                 case '/':
-                    if (match('/'))
+                    if (Match('/'))
                         // A comment goes until the end of the line.
-                        while (peek() != '\n' && !isAtEnd())
-                            advance();
+                        while (Peek() != '\n' && !IsAtEnd())
+                            Advance();
                     else
-                        addToken(TokenType.SLASH);
+                        AddToken(TokenType.SLASH);
 
                     break;
                 //< slash
@@ -175,16 +174,12 @@ namespace LoxInterpreter
         Lox.error(line, "Unexpected character.");
 */
 //> digit-start
-                    if (isDigit(c))
-                    {
-                        number();
+                    if (IsDigit(c))
+                        Number();
 //> identifier-start
-                    }
-                    else if (isAlpha(c))
-                    {
-                        identifier();
+                    else if (IsAlpha(c))
+                        Identifier();
 //< identifier-start
-                    }
 
 //< digit-start
                     break;
@@ -194,9 +189,9 @@ namespace LoxInterpreter
 
 //< scan-token
 //> identifier
-        private void identifier()
+        private void Identifier()
         {
-            while (isAlphaNumeric(peek())) advance();
+            while (IsAlphaNumeric(Peek())) Advance();
 
 /* Scanning identifier < Scanning keyword-type
     addToken(IDENTIFIER);
@@ -209,26 +204,26 @@ namespace LoxInterpreter
                 type = keywords[text];
             else //keywords.Add(text, TokenType.IDENTIFIER);
                 type = TokenType.IDENTIFIER;
-            addToken(type);
+            AddToken(type);
 //< keyword-type
         }
 
 //< identifier
 //> number
-        private void number()
+        private void Number()
         {
-            while (isDigit(peek())) advance();
+            while (IsDigit(Peek())) Advance();
 
             // Look for a fractional part.
-            if (peek() == '.' && isDigit(peekNext()))
+            if (Peek() == '.' && IsDigit(PeekNext()))
             {
                 // Consume the "."
-                advance();
+                Advance();
 
-                while (isDigit(peek())) advance();
+                while (IsDigit(Peek())) Advance();
             }
 
-            addToken(TokenType.NUMBER,
+            AddToken(TokenType.NUMBER,
                 double.Parse(source.Substring(start, current - start)));
         }
 
@@ -236,29 +231,29 @@ namespace LoxInterpreter
 //> string
         private void String()
         {
-            while (peek() != '"' && !isAtEnd())
+            while (Peek() != '"' && !IsAtEnd())
             {
-                if (peek() == '\n') line++;
-                advance();
+                if (Peek() == '\n') line++;
+                Advance();
             }
 
-            if (isAtEnd())
+            if (IsAtEnd())
                 //Lox.error(line, "Unterminated string.");
                 return;
 
             // The closing ".
-            advance();
+            Advance();
 
             // Trim the surrounding quotes.
             var value = source.Substring(start + 1, current - start - 2);
-            addToken(TokenType.STRING, value);
+            AddToken(TokenType.STRING, value);
         }
 
 //< string
 //> match
-        private bool match(char expected)
+        private bool Match(char expected)
         {
-            if (isAtEnd()) return false;
+            if (IsAtEnd()) return false;
             if (source[current] != expected) return false;
 
             current++;
@@ -267,15 +262,15 @@ namespace LoxInterpreter
 
 //< match
 //> peek
-        private char peek()
+        private char Peek()
         {
-            if (isAtEnd()) return '\0';
+            if (IsAtEnd()) return '\0';
             return source[current];
         }
 
 //< peek
 //> peek-next
-        private char peekNext()
+        private char PeekNext()
         {
             if (current + 1 >= source.Length) return '\0';
             return source[current + 1];
@@ -283,45 +278,45 @@ namespace LoxInterpreter
 
 //< peek-next
 //> is-alpha
-        private bool isAlpha(char c)
+        private bool IsAlpha(char c)
         {
             return c >= 'a' && c <= 'z' ||
                    c >= 'A' && c <= 'Z' ||
                    c == '_';
         }
 
-        private bool isAlphaNumeric(char c)
+        private bool IsAlphaNumeric(char c)
         {
-            return isAlpha(c) || isDigit(c);
+            return IsAlpha(c) || IsDigit(c);
         }
 
 //< is-alpha
 //> is-digit
-        private bool isDigit(char c)
+        private bool IsDigit(char c)
         {
             return c >= '0' && c <= '9';
         } // [is-digit]
 
 //< is-digit
 //> is-at-end
-        private bool isAtEnd()
+        private bool IsAtEnd()
         {
             return current >= source.Length;
         }
 
 //< is-at-end
 //> advance-and-add-token
-        private char advance()
+        private char Advance()
         {
             return source[current++];
         }
 
-        private void addToken(TokenType type)
+        private void AddToken(TokenType type)
         {
-            addToken(type, null);
+            AddToken(type, null);
         }
 
-        private void addToken(TokenType type, object literal)
+        private void AddToken(TokenType type, object literal)
         {
             var text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));

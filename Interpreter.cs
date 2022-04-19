@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 //using LoxInterpreter.Properties;
 
 namespace LoxInterpreter
@@ -11,13 +12,13 @@ namespace LoxInterpreter
   Environment environment = new Environment();
 */
 //> Functions global-environment
-        private static readonly Environment globals = new Environment();
-
-        private Environment environment = globals;
+        private static readonly Environment Globals = new Environment();
 
 //< Functions global-environment
 //> Resolving and Binding locals-field
         private readonly Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
+
+        private Environment environment = Globals;
 //< Resolving and Binding locals-field
 //> Statements and State environment-field
 
@@ -25,7 +26,7 @@ namespace LoxInterpreter
 //> Functions interpreter-constructor
         public Interpreter()
         {
-            globals.Define("clock", new Clock());
+            Globals.Define("clock", new Clock());
         }
 
 //< Statements and State Execute-block
@@ -137,7 +138,7 @@ namespace LoxInterpreter
 
         public object VisitIfStmt(Stmt.If stmt)
         {
-            if (isTruthy(Evaluate(stmt.condition)))
+            if (IsTruthy(Evaluate(stmt.condition)))
                 Execute(stmt.thenBranch);
             else if (stmt.elseBranch != null) Execute(stmt.elseBranch);
 
@@ -151,7 +152,7 @@ namespace LoxInterpreter
         public object VisitPrintStmt(Stmt.Print stmt)
         {
             var value = Evaluate(stmt.expression);
-            Console.WriteLine(stringify(value));
+            Console.WriteLine(Stringify(value));
 
             return null;
         }
@@ -168,7 +169,6 @@ namespace LoxInterpreter
             //Console.WriteLine(value);
 
             throw new Return(value); //! maybe important
-            return value;
         }
 
 //< Functions Visit-return
@@ -190,7 +190,7 @@ namespace LoxInterpreter
 
         public object VisitWhileStmt(Stmt.While stmt)
         {
-            while (isTruthy(Evaluate(stmt.condition))) Execute(stmt.body);
+            while (IsTruthy(Evaluate(stmt.condition))) Execute(stmt.body);
 
             return null;
         }
@@ -208,15 +208,14 @@ namespace LoxInterpreter
 //> Resolving and Binding resolved-assign
 
 
-            int distance;
             if (locals.ContainsKey(expr))
             {
-                distance = locals[expr];
+                var distance = locals[expr];
                 environment.AssignAt(distance, expr.name, value);
             }
             else
             {
-                globals.Assign(expr.name, value);
+                Globals.Assign(expr.name, value);
             }
 
 //< Resolving and Binding resolved-assign
@@ -236,9 +235,9 @@ namespace LoxInterpreter
             {
 //> binary-equality
                 case TokenType.BANG_EQUAL:
-                    return !isEqual(left, right);
+                    return !IsEqual(left, right);
                 case TokenType.EQUAL_EQUAL:
-                    return isEqual(left, right);
+                    return IsEqual(left, right);
 //< binary-equality
 //> binary-comparison
                 case TokenType.GREATER:
@@ -373,11 +372,11 @@ namespace LoxInterpreter
 
             if (expr.op.type == TokenType.OR)
             {
-                if (isTruthy(left)) return left;
+                if (IsTruthy(left)) return left;
             }
             else
             {
-                if (!isTruthy(left)) return left;
+                if (!IsTruthy(left)) return left;
             }
 
             return Evaluate(expr.right);
@@ -454,7 +453,7 @@ namespace LoxInterpreter
             {
 //> unary-bang
                 case TokenType.BANG:
-                    return !isTruthy(right);
+                    return !IsTruthy(right);
 //< unary-bang
                 case TokenType.MINUS:
 //> check-unary-operand
@@ -558,7 +557,7 @@ namespace LoxInterpreter
                 return environment.GetAt(distance, name.lexeme);
             }
 
-            return globals.Get(name);
+            return Globals.Get(name);
         }
 
 //< Resolving and Binding look-up-variable
@@ -583,7 +582,7 @@ namespace LoxInterpreter
 
 //< check-operands
 //> is-truthy
-        private bool isTruthy(object obj)
+        private bool IsTruthy(object obj)
         {
             if (obj == null) return false;
             if (obj is bool) return (bool) obj;
@@ -592,7 +591,7 @@ namespace LoxInterpreter
 
 //< is-truthy
 //> is-equal
-        private bool isEqual(object a, object b)
+        private bool IsEqual(object a, object b)
         {
             if (a == null && b == null) return true;
             if (a == null) return false;
@@ -602,7 +601,7 @@ namespace LoxInterpreter
 
 //< is-equal
 //> stringify
-        private string stringify(object obj)
+        private string Stringify(object obj)
         {
             if (obj == null) return "nil";
 
@@ -620,8 +619,6 @@ namespace LoxInterpreter
                     return "true";
                 return "false";
             }
-
-            return obj.ToString();
 
             return obj.ToString();
         }

@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using System.Text;
-using LoxInterpreter.Properties;
 
 namespace LoxInterpreter
 {
     public class LoxInterpreter
     {
-        private static readonly Interpreter interpreter = new Interpreter();
+        private static readonly Interpreter Interpreter = new Interpreter();
 
         private static void Main(string[] args)
         {
@@ -43,12 +42,12 @@ namespace LoxInterpreter
         private static void Run(string source)
         {
             var scanner = new Scanner(source);
-            var tokens = scanner.scanTokens();
+            var tokens = scanner.ScanTokens();
             var parser = new Parser(tokens);
             var statements = parser.Parse();
-            var resolver = new Resolver(interpreter);
-            resolver.resolve(statements);
-            interpreter.Interpret(statements);
+            var resolver = new Resolver(Interpreter);
+            resolver.Resolve(statements);
+            Interpreter.Interpret(statements);
 
             //  foreach (var token in tokens) {
             //      Console.WriteLine(token);

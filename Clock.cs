@@ -19,7 +19,7 @@ namespace LoxInterpreter
         }
 
         //deleted override below
-        public string ToString()
+        public override string ToString()
         {
             return "<native fn>";
         }
