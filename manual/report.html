@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
 
-    <title>Spring 2022 | LISP Interpreter Project</title>
+    <title>Spring 2022 | JLox Interpreter Project</title>
 
     <link href="./report.css" rel="stylesheet" />
     <script async src="/cdn-cgi/bm/cv/669835187/api.js"></script>
@@ -134,58 +134,41 @@
           <div class="section">
             <h4>Research/Learning</h4>
             <p>
-              We took a group approach for the research required for this
-              project. This involved meeting up as a group every Tuesday at the
-              library. During these meetings, we discussed the goals of the
-              project, the language to use, and how to implement each part of
-              the interpreter (scanner, parser, and the interpreter. We popcorn
-              read the Crafting Interpreters textbook in order to learn about
-              the general grammar of languages (this is an agile team building
-              exercise). This was a great opportunity to get to learn about
-              interpreter concepts together as a group and stay on the same
-              page. After we learned about the general grammar of languages
-              through the implementation of JLox. We then learned about LISP, we
-              played around with a Common Lisp by using Steel Bank Common Lisp
-              (SBCL). This helped us understand some general Lisp concepts. Then
-              we read through Kamin's Pascal Lisp to see the flavour of Lisp we
-              will be implementing. After all of this was complete we could then
-              begin to work on our own implementation of the Kamin's Lisp.
+              Since we already read most of the book,
+              <a href="https://craftinginterpreters.com/contents.html"
+                >Crafting interpreters</a
+              >, together for project one, we were already familiar with the
+              language. Throughout the development of our version of the Lox
+              interpreter we heavily referenced the book. We chose to use the C#
+              language to implement our version of Lox since it is similar to
+              Java. Even though they are similar, there are still quite a few
+              differences. We had to research C# in order to implement our
+              version of Lox. Thankfully there are plenty of resources to help
+              with this. We used Microsoft's C# documentation and also a table
+              from Tangible Software Solutions that had common C# and Java
+              equivalents. The documentation for C# can be found
+              <a href="https://docs.microsoft.com/en-us/dotnet/csharp/">here</a>
+              and the table can be found
+              <a
+                href="https://www.tangiblesoftwaresolutions.com/java-and-csharp-equivalents.html"
+                >here</a
+              >. After learning about C# we were ready to begin creating our
+              interpreter.
             </p>
             <h4>Design</h4>
             <p>
-              Since this project has many parts that must work together, we had
-              to make some selective design choices. Due to all group members'
-              familiarity with python, that is the language we selected. We
-              decided to use python's built-in operator library to implement the
-              operators and define our own functions as needed. We whiteboarded
-              different ideas for the implementation of the code and discussed
-              as a group our plans for implementation of certain functionalities
-              such as operators, types (number?, symbol?, list?, null?),
-              replacing true and false with T and (), printing, and other built
-              in names such as if, while, set, begin, cons, car, cdr, and how to
-              implement function definition and calling. For the define functionality,
-              we defined a class named Procedure that has the function's parameters,
-              formula, and environment (implemented as a python dictionary) as its
-              attributes. When a later Lisp command uses the predefined function, the
-              class adds the parameters given to the list of environment dictionaries
-              and evaluates the function.
+              Although C# and Java were similar languages, there were still
+              quite a few differences, and some of these caused us to have to
+              make some selective design choices. The first major difference
+              that is seen in every file is since we are using C#, we decided to
+              follow
+              <a
+                href="https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions"
+                >C#'s naming convention</a
+              > with some of our own changes.
             </p>
             <h4>Implementation of Code</h4>
-            <p>
-              To implement this code, we met as a group many times until the
-              project was complete. One group member would broadcast their
-              screen onto a TV in a group study room in Gorgas and the others
-              would discuss specifically how to implement the design we came up
-              with in the beginning stages of development. We changed which
-              member would be broadcasting their screen and which members would
-              be verbally describing how to implement the design. We worked
-              collaboratively and efficiently to implement this program as a
-              group using a style of trio programming that has been common
-              throughout internships. This style of implementation worked well
-              for us as we were able to communicate efficiently and clearly with
-              each other throughout the process so our design could come to
-              life.
-            </p>
+            <p></p>
           </div>
           <p></p>
         </div>
@@ -333,7 +316,7 @@
               </p>
             </div>
             <div style="float: right">
-                <!-- Thanks Dr. Yessick -->
+              <!-- Thanks Dr. Yessick -->
               <img id="test-case-all" src="./pictures/testerresults.png" />
             </div>
           </div>
@@ -476,46 +459,14 @@
             </ul>
             <div class="center" id="part3-test-case-img-container">
               <img id="test-case-1" src="./pictures/case-1.png" />
-              <img
-                class="hide"
-                id="test-case-2"
-                src="./pictures/case-2.png"
-              />
-              <img
-                class="hide"
-                id="test-case-3"
-                src="./pictures/case-3.png"
-              />
-              <img
-                class="hide"
-                id="test-case-4"
-                src="./pictures/case-4.png"
-              />
-              <img
-                class="hide"
-                id="test-case-5"
-                src="./pictures/case-5.png"
-              />
-              <img
-                class="hide"
-                id="test-case-6"
-                src="./pictures/case-6.png"
-              />
-              <img
-                class="hide"
-                id="test-case-7"
-                src="./pictures/case-7.png"
-              />
-              <img
-                class="hide"
-                id="test-case-8"
-                src="./pictures/case-8.png"
-              />
-              <img
-                class="hide"
-                id="test-case-9"
-                src="./pictures/case-9.png"
-              />
+              <img class="hide" id="test-case-2" src="./pictures/case-2.png" />
+              <img class="hide" id="test-case-3" src="./pictures/case-3.png" />
+              <img class="hide" id="test-case-4" src="./pictures/case-4.png" />
+              <img class="hide" id="test-case-5" src="./pictures/case-5.png" />
+              <img class="hide" id="test-case-6" src="./pictures/case-6.png" />
+              <img class="hide" id="test-case-7" src="./pictures/case-7.png" />
+              <img class="hide" id="test-case-8" src="./pictures/case-8.png" />
+              <img class="hide" id="test-case-9" src="./pictures/case-9.png" />
               <img
                 class="hide"
                 id="test-case-10"
@@ -761,7 +712,9 @@
       "#part3-test-case-img-container :not(.hide)"
     );
     // thanks Dr. Yessick
-    if (previousImage != null) { previousImage.classList.toggle("hide"); }
+    if (previousImage != null) {
+      previousImage.classList.toggle("hide");
+    }
     previousImage.classList.toggle("hide");
     const nextImage = document.querySelector("#test-case-" + num);
     nextImage.classList.toggle("hide");
