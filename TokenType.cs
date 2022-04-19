@@ -1,11 +1,16 @@
 namespace LoxInterpreter
+
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 {
     /// <summary>
     /// categories of tokens taken from input
     /// </summary>
     public enum TokenType
     {
-        // Single-character tokens.
+        // tokens with one character
         LEFT_PAREN,
         RIGHT_PAREN,
         LEFT_BRACE,
@@ -18,7 +23,7 @@ namespace LoxInterpreter
         SLASH,
         STAR,
 
-        // One or two character tokens.
+        // tokens with either one or two characters (= and ==, etc)
         BANG,
         BANG_EQUAL,
         EQUAL,
@@ -28,12 +33,12 @@ namespace LoxInterpreter
         LESS,
         LESS_EQUAL,
 
-        // Literals.
+        // literals
         IDENTIFIER,
         STRING,
         NUMBER,
 
-        // Keywords.
+        // keywords
         AND,
         CLASS,
         ELSE,
@@ -51,6 +56,7 @@ namespace LoxInterpreter
         VAR,
         WHILE,
 
+        // end of file
         EOF
     }
 }

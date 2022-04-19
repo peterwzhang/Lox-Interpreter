@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 namespace LoxInterpreter
 {
     /// <summary>
@@ -140,6 +144,7 @@ namespace LoxInterpreter
             return null;
         }
 
+        // resolves set expressions (setters)
         public object VisitSetExpr(Expr.Set expr)
         {
             Resolve(expr.value);
@@ -186,12 +191,14 @@ namespace LoxInterpreter
             currentFunction = type;
 
             BeginScope();
+            // declares and defines function parameters
             foreach (var param in function.parms)
             {
                 Declare(param);
                 Define(param);
             }
 
+            // resolves function body
             Resolve(function.body);
             EndScope();
             currentFunction = enclosingFunction;
@@ -239,11 +246,11 @@ namespace LoxInterpreter
                 }
         }
 
+        // function types (only none and function since not implementing classes)
         private enum FunctionType
         {
             NONE,
             FUNCTION,
-            INITIALIZER
         }
     }
 }

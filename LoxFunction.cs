@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 namespace LoxInterpreter
 {
     /// <summary>
@@ -35,10 +39,12 @@ namespace LoxInterpreter
         // implements call() of ILoxCallable
         public object Call(Interpreter interpreter, List<object> arguments)
         {
+            // creates environment from args
             var environment = new Environment(closure);
             for (var i = 0; i < declaration.parms.Count; i++)
                 environment.Define(declaration.parms[i].lexeme, arguments[i]);
 
+            // executes function call
             try
             {
                 interpreter.ExecuteBlock(declaration.body, environment);

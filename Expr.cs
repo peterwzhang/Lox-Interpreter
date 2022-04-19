@@ -1,13 +1,19 @@
 using System.Collections.Generic;
 
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// class of expressions
+    /// </summary>
     public abstract class Expr
     {
-        //< expr-variable
-
         public abstract T Accept<T>(IVisitor<T> visitor);
 
+        // visitor interface for each expression type
         public interface IVisitor<T>
         {
             T VisitAssignExpr(Assign expr);
@@ -17,15 +23,12 @@ namespace LoxInterpreter
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
-
             T VisitSetExpr(Set expr);
-
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
 
-        // Nested Expr classes here...
-        //> expr-assign
+        // assign expression definition
         public class Assign : Expr
         {
             public Token name;
@@ -43,8 +46,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-assign
-        //> expr-binary
+        // binary expression definition
         public class Binary : Expr
         {
             public Expr left;
@@ -64,8 +66,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-binary
-        //> expr-call
+        // function call definition
         public class Call : Expr
         {
             public List<Expr> arguments;
@@ -86,8 +87,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-call
-        //> expr-get
+        // get expression (getter) definition
         public class Get : Expr
         {
             public Token name;
@@ -106,8 +106,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-get
-        //> expr-grouping
+        // grouped expression (in parentheses) definition
         public class Grouping : Expr
         {
             public Expr expression;
@@ -123,8 +122,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-grouping
-        //> expr-literal
+        // literal expression definition
         public class Literal : Expr
         {
             public object value;
@@ -140,8 +138,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-literal
-        //> expr-logical
+        // logical expression definition
         public class Logical : Expr
         {
             public Expr left;
@@ -161,8 +158,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-logical
-        //> expr-set
+        // set expression (setter) definition
         public class Set : Expr
         {
             public Token name;
@@ -183,8 +179,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-this
-        //> expr-unary
+        // unary expression definition
         public class Unary : Expr
         {
             public Token op;
@@ -202,8 +197,7 @@ namespace LoxInterpreter
             }
         }
 
-        //< expr-unary
-        //> expr-variable
+        // variable expression definition
         public class Variable : Expr
         {
             public Token name;

@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 namespace LoxInterpreter
 {
     /// <summary>
@@ -22,7 +26,7 @@ namespace LoxInterpreter
             T VisitWhileStmt(While stmt);
         }
 
-        // calls IVisit interface on given block statements
+        // defines block statements
         public class Block : Stmt
         {
             public List<Stmt> statements;
@@ -38,7 +42,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given expressions
+        // defines expression statements
         public class Expression : Stmt
         {
             public Expr expression;
@@ -54,7 +58,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given functions
+        // defines function statements
         public class Function : Stmt
         {
             public List<Stmt> body;
@@ -76,7 +80,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given if statements
+        // defines if statements
         public class If : Stmt
         {
             public Expr condition;
@@ -96,7 +100,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given print statements
+        // defines print statements
         public class Print : Stmt
         {
             public Expr expression;
@@ -112,7 +116,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given return statements
+        // defines return statements
         public class Return : Stmt
         {
             public readonly Token keyword;
@@ -130,7 +134,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given variables
+        // defines variable statements
         public class Var : Stmt
         {
             public Expr initializer;
@@ -150,7 +154,7 @@ namespace LoxInterpreter
             }
         }
 
-        // calls IVisit interface on given while statements
+        // defines while statements
         public class While : Stmt
         {
             public Stmt body;

@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 namespace LoxInterpreter
 {
     /// <summary>
@@ -73,6 +77,7 @@ namespace LoxInterpreter
         private int line = 1;
 
 
+        // constructor for Scanner
         public Scanner(string source)
         {
             this.source = source;
@@ -128,7 +133,7 @@ namespace LoxInterpreter
                 case '*':
                     AddToken(TokenType.STAR);
                     break;
-                // operators with two characters
+                // tokens for operators with two characters
                 case '!':
                     AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
@@ -165,6 +170,7 @@ namespace LoxInterpreter
                     String();
                     break;
 
+                // default case if token is a number or character
                 default:
                     if (IsDigit(c))
                         Number();
@@ -225,6 +231,7 @@ namespace LoxInterpreter
         }
 
         // similar to Advance(), but employs maximal munch
+        // checks if current matches expected
         private bool Match(char expected)
         {
             if (IsAtEnd()) return false;
