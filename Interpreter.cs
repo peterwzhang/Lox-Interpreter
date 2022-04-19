@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+// group members: Peter Zhang, Madeline Moore, Cara Cannarozzi
+// Crafting Interpreters book by Robert Nystrom used as a reference
+// https://craftinginterpreters.com/contents.html
+
 namespace LoxInterpreter
 {
     // interprets expressions
@@ -167,6 +171,7 @@ namespace LoxInterpreter
             return function.Call(this, arguments);
         }
 
+        // evaluates get expressions (getters)
         public object VisitGetExpr(Expr.Get expr)
         {
             return null;
@@ -201,6 +206,7 @@ namespace LoxInterpreter
             return Evaluate(expr.right);
         }
 
+        // evaluates set expressions (setters)
         public object VisitSetExpr(Expr.Set expr)
         {
             return null;
@@ -293,12 +299,14 @@ namespace LoxInterpreter
             return Globals.Get(name);
         }
 
+        // checks the operand type for unary expressions
         private void CheckNumberOperand(Token op, object operand)
         {
             if (operand is double)
                 return;
         }
 
+        // checks the operand type for binary expressions
         private void CheckNumberOperands(Token op,
             object left, object right)
         {
@@ -334,8 +342,10 @@ namespace LoxInterpreter
         // converts lox object to string
         private string Stringify(object obj)
         {
+            // handles if null
             if (obj == null) return "nil";
 
+            // handles if number
             if (obj is double)
             {
                 var text = obj.ToString();
@@ -344,6 +354,7 @@ namespace LoxInterpreter
                 return text;
             }
 
+            // handles if bool
             if (obj is bool)
             {
                 if ((bool) obj)
@@ -351,6 +362,7 @@ namespace LoxInterpreter
                 return "false";
             }
 
+            // handles if anything else
             return obj.ToString();
         }
     }
