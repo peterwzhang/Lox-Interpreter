@@ -14,18 +14,13 @@ namespace LoxInterpreter
         private readonly Environment closure;
         private readonly Stmt.Function declaration;
 
-        private bool isInitializer;
-
         /// <summary>
         /// initializes environment from closure (constructor)
         /// </summary>
         /// <param name="declaration"></param>
         /// <param name="closure"></param>
-        /// <param name="isInitializer"></param>
-        public LoxFunction(Stmt.Function declaration, Environment closure,
-            bool isInitializer)
+        public LoxFunction(Stmt.Function declaration, Environment closure)
         {
-            this.isInitializer = isInitializer;
             this.closure = closure;
             this.declaration = declaration;
         }
@@ -51,7 +46,7 @@ namespace LoxInterpreter
             }
             catch (Return returnValue)
             {
-                return returnValue.value;
+                return returnValue.Value;
             }
 
             return null;

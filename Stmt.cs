@@ -119,13 +119,13 @@ namespace LoxInterpreter
         // defines return statements
         public class Return : Stmt
         {
-            public readonly Token keyword;
-            public readonly Expr value;
+            public readonly Token Keyword;
+            public readonly Expr Value;
 
             public Return(Token keyword, Expr value)
             {
-                this.keyword = keyword;
-                this.value = value;
+                this.Keyword = keyword;
+                this.Value = value;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

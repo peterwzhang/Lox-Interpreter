@@ -13,7 +13,7 @@ namespace LoxInterpreter
         public TokenType type;
         public string lexeme;
         public object literal;
-        public int line; // [location]
+        public int Line; // [location]
 
         /// <summary>
         /// constructs token from provided arguments
@@ -27,7 +27,7 @@ namespace LoxInterpreter
             this.type = type;
             this.lexeme = lexeme;
             this.literal = literal;
-            this.line = line;
+            this.Line = line;
         }
 
         // converts token to string

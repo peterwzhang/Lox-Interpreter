@@ -67,7 +67,7 @@ namespace LoxInterpreter
         // resolves return statement
         public object VisitReturnStmt(Stmt.Return stmt)
         {
-            Resolve(stmt.value);
+            Resolve(stmt.Value);
 
             return null;
         }

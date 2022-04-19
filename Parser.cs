@@ -41,7 +41,7 @@ namespace LoxInterpreter
         {
             try
             {
-                if (Match(TokenType.FUN)) return Function("function");
+                if (Match(TokenType.FUN)) return Function();
                 if (Match(TokenType.VAR)) return VarDeclaration();
 
                 return Statement();
@@ -69,7 +69,7 @@ namespace LoxInterpreter
         // parses for loop
         private Stmt ForStatement()
         {
-            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+            Consume(TokenType.LEFT_PAREN);
 
             // initializer for for loop
             Stmt initializer;
@@ -84,14 +84,14 @@ namespace LoxInterpreter
             Expr condition = null;
             if (!Check(TokenType.SEMICOLON)) condition = Expression();
 
-            Consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+            Consume(TokenType.SEMICOLON);
 
             // increments index
             Expr increment = null;
             if (!Check(TokenType.RIGHT_PAREN)) increment = Expression();
 
             // body of for loop
-            Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+            Consume(TokenType.RIGHT_PAREN);
             var body = Statement();
 
             if (increment != null)
@@ -125,9 +125,9 @@ namespace LoxInterpreter
         // parses if statements
         private Stmt IfStatement()
         {
-            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+            Consume(TokenType.LEFT_PAREN);
             var condition = Expression();
-            Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition."); 
+            Consume(TokenType.RIGHT_PAREN); 
             
             var thenBranch = Statement();
             Stmt elseBranch = null;
@@ -140,7 +140,7 @@ namespace LoxInterpreter
         private Stmt PrintStatement()
         {
             var value = Expression();
-            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            Consume(TokenType.SEMICOLON);
             return new Stmt.Print(value);
         }
 
@@ -151,27 +151,27 @@ namespace LoxInterpreter
             Expr value = null;
             if (!Check(TokenType.SEMICOLON)) value = Expression();
 
-            Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+            Consume(TokenType.SEMICOLON);
             return new Stmt.Return(keyword, value);
         }
 
         private Stmt VarDeclaration()
         {
-            var name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
+            var name = Consume(TokenType.IDENTIFIER);
 
             Expr initializer = null;
             if (Match(TokenType.EQUAL)) initializer = Expression();
 
-            Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            Consume(TokenType.SEMICOLON);
             return new Stmt.Var(name, initializer);
         }
 
         // parses while statement
         private Stmt WhileStatement()
         {
-            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+            Consume(TokenType.LEFT_PAREN);
             var condition = Expression();
-            Consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+            Consume(TokenType.RIGHT_PAREN);
             var body = Statement();
 
             return new Stmt.While(condition, body);
@@ -181,28 +181,28 @@ namespace LoxInterpreter
         private Stmt ExpressionStatement()
         {
             var expr = Expression();
-            Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+            Consume(TokenType.SEMICOLON);
             return new Stmt.Expression(expr);
         }
 
         // parses functions
-        private Stmt.Function Function(string kind)
+        private Stmt.Function Function()
         {
-            var name = Consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
+            var name = Consume(TokenType.IDENTIFIER);
             // parses parameter list and parentheses
-            Consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+            Consume(TokenType.LEFT_PAREN);
             var parameters = new List<Token>();
             if (!Check(TokenType.RIGHT_PAREN))
                 do
                 {
                     parameters.Add(
-                        Consume(TokenType.IDENTIFIER, "Expect parameter name."));
+                        Consume(TokenType.IDENTIFIER));
                 } while (Match(TokenType.COMMA));
 
-            Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+            Consume(TokenType.RIGHT_PAREN);
 
             // parses body and wraps it in function node
-            Consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+            Consume(TokenType.LEFT_BRACE);
             var body = Block();
             return new Stmt.Function(name, parameters, body);
         }
@@ -214,7 +214,7 @@ namespace LoxInterpreter
 
             while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd()) statements.Add(Declaration());
 
-            Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+            Consume(TokenType.RIGHT_BRACE);
             return statements;
         }
 
@@ -226,7 +226,6 @@ namespace LoxInterpreter
             if (Match(TokenType.EQUAL))
             {
                 // recursively calls Assignment() on right hand side
-                var equals = Previous(); //TODO: this is not used
                 var value = Assignment();
 
                 if (expr is Expr.Variable)
@@ -361,8 +360,7 @@ namespace LoxInterpreter
                     arguments.Add(Expression());
                 } while (Match(TokenType.COMMA));
 
-            var paren = Consume(TokenType.RIGHT_PAREN,
-                "Expect ')' after arguments.");
+            var paren = Consume(TokenType.RIGHT_PAREN);
 
             return new Expr.Call(callee, paren, arguments);
         }
@@ -380,8 +378,7 @@ namespace LoxInterpreter
                 }
                 else if (Match(TokenType.DOT))
                 {
-                    var name = Consume(TokenType.IDENTIFIER,
-                        "Expect property name after '.'.");
+                    var name = Consume(TokenType.IDENTIFIER);
                     expr = new Expr.Get(expr, name);
                 }
                 else
@@ -410,7 +407,7 @@ namespace LoxInterpreter
             if (Match(TokenType.LEFT_PAREN))
             {
                 var expr = Expression();
-                Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
+                Consume(TokenType.RIGHT_PAREN);
                 return new Expr.Grouping(expr);
             }
             
@@ -437,11 +434,10 @@ namespace LoxInterpreter
 
         // checks if token is of desired type
         // if true, consumes token and continues
-        private Token Consume(TokenType type, string message) //TODO: message is not used
+        private Token Consume(TokenType type)
         {
             if (Check(type)) return Advance();
-            //TODO: is this right
-            return Advance();
+            return null;
         }
 
         /// <summary>

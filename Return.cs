@@ -13,11 +13,11 @@ namespace LoxInterpreter
     /// </summary>
     public class Return : Exception
     {
-        public readonly object value;
+        public readonly object Value;
 
         public Return(object val)
         {
-            value = val;
+            Value = val;
         }
     }
 }
