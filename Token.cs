@@ -1,11 +1,14 @@
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// class that tracks location of tokens
+    /// </summary>
     public class Token
     {
-        public string lexeme;
-        public int line; // [location]
-        public object literal;
         public TokenType type;
+        public string lexeme;
+        public object literal;
+        public int line; // [location]
 
         public Token(TokenType type, string lexeme, object literal, int line)
         {

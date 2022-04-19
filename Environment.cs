@@ -2,44 +2,48 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// class containing dictionary of variables
+    /// </summary>
     public class Environment
     {
-        //> enclosing-field
         public readonly Environment enclosing;
 
-        //< enclosing-field
         private readonly Dictionary<string, object> values = new Dictionary<string, object>();
 
-        //> environment-constructors
+        // sets outer environment to null (constructor)
         public Environment()
         {
             enclosing = null;
         }
 
+        // sets outer environment to "enclosing" (constructor with arg)
         public Environment(Environment enclosing)
         {
             this.enclosing = enclosing;
         }
-        //< environment-constructors
-        //> environment-get
 
+        /// <summary>
+        /// looks up variables once they've been put in the dictionary
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>value associated with name</returns>
         public object Get(Token name)
         {
             if (values.ContainsKey(name.lexeme)) return values[name.lexeme];
-            //> environment-get-enclosing
 
             if (enclosing != null)
                 return enclosing.Get(name);
-            //< environment-get-enclosing
 
-            // throw new RuntimeError(name,
-            //   "Undefined variable '" + name.lexeme + "'.");
             return enclosing.Get(name);
-            //return null;
         }
 
-        //< environment-get
-        //> environment-assign
+        /// <summary>
+        /// assigns a value to a pre-existing variable
+        /// CANNOT create a new variable
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
         public void Assign(Token name, object value)
         {
             if (values.ContainsKey(name.lexeme))
@@ -48,16 +52,15 @@ namespace LoxInterpreter
                 return;
             }
 
-            //> environment-assign-enclosing
             if (enclosing != null) enclosing.Assign(name, value);
-
-            //< environment-assign-enclosing
-            // throw new RuntimeError(name,
-            //   "Undefined variable '" + name.lexeme + "'.");
         }
 
-        //< environment-assign
-        //> environment-define
+        /// <summary>
+        /// binds a name to a value
+        /// adds name and value to dictionary
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
         public void Define(string name, object value)
         {
             if (values.ContainsKey(name))
@@ -66,8 +69,7 @@ namespace LoxInterpreter
                 values.Add(name, value);
         }
 
-        //< environment-define
-        //> Resolving and Binding ancestor
+        // returns parent environment from "distance" in environment
         public Environment Ancestor(int distance)
         {
             var environment = this;
@@ -76,22 +78,18 @@ namespace LoxInterpreter
             return environment;
         }
 
-        //< Resolving and Binding ancestor
-        //> Resolving and Binding get-at
+        // gets a variable at a certain distance in the environment
         public object GetAt(int distance, string name)
         {
             return Ancestor(distance).values[name];
         }
 
-        //< Resolving and Binding get-at
-        //> Resolving and Binding assign-at
+        // assigns a variable at a specific depth of the environment
         public void AssignAt(int distance, Token name, object value)
         {
             Ancestor(distance).values[name.lexeme] = value;
         }
 
-        //< Resolving and Binding assign-at
-        //> omit
         public override string ToString()
         {
             var result = values.ToString();
@@ -99,6 +97,5 @@ namespace LoxInterpreter
 
             return result;
         }
-        //< omit
     }
 }

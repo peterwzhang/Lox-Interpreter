@@ -2,8 +2,13 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// class for the scanner
+    /// input is stored as a string, turn into list of tokens
+    /// </summary>
     public class Scanner
     {
+        // handles keywords of the lox language
         private readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
         {
             {
@@ -56,29 +61,28 @@ namespace LoxInterpreter
             }
         };
 
-//< keyword-map
+        // source string
         private readonly string source;
 
+        // list of tokens (empty for now)
         private readonly List<Token> tokens = new List<Token>();
+        
+        // keeps track of where scanner is in source
+        private int start;
         private int current;
-
         private int line = 1;
 
-//> scan-state
-        private int start;
-//< scan-state
 
         public Scanner(string source)
         {
             this.source = source;
         }
 
-//> scan-tokens
+        // fills token list with tokens
         public List<Token> ScanTokens()
         {
             while (!IsAtEnd())
             {
-                // We are at the beginning of the next lexeme.
                 start = current;
                 ScanToken();
             }
@@ -87,13 +91,13 @@ namespace LoxInterpreter
             return tokens;
         }
 
-//< scan-tokens
-//> scan-token
+        // scans a single token (called in for loop in ScanTokens)
         private void ScanToken()
         {
             var c = Advance();
             switch (c)
             {
+                // tokens with only one character
                 case '(':
                     AddToken(TokenType.LEFT_PAREN);
                     break;
@@ -123,8 +127,8 @@ namespace LoxInterpreter
                     break;
                 case '*':
                     AddToken(TokenType.STAR);
-                    break; // [slash]
-//> two-char-tokens
+                    break;
+                // operators with two characters
                 case '!':
                     AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
@@ -137,89 +141,64 @@ namespace LoxInterpreter
                 case '>':
                     AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                     break;
-                //< two-char-tokens
-                //> slash
+                // handles the fact that a slash is used for division and comments
                 case '/':
                     if (Match('/'))
-                        // A comment goes until the end of the line.
                         while (Peek() != '\n' && !IsAtEnd())
                             Advance();
                     else
                         AddToken(TokenType.SLASH);
 
                     break;
-                //< slash
-                //> whitespace
 
+                // ignores whitespace
                 case ' ':
                 case '\r':
                 case '\t':
-                    // Ignore whitespace.
                     break;
 
                 case '\n':
                     line++;
                     break;
-//< whitespace
-//> string-start
 
                 case '"':
                     String();
                     break;
-//< string-start
-//> char-error
 
                 default:
-/* Scanning char-error < Scanning digit-start
-        Lox.error(line, "Unexpected character.");
-*/
-//> digit-start
                     if (IsDigit(c))
                         Number();
-//> identifier-start
                     else if (IsAlpha(c))
                         Identifier();
-//< identifier-start
 
-//< digit-start
                     break;
-//< char-error
             }
         }
 
-//< scan-token
-//> identifier
+        // checks if an identifier matches anything in keywords dictionary
         private void Identifier()
         {
             while (IsAlphaNumeric(Peek())) Advance();
 
-/* Scanning identifier < Scanning keyword-type
-    addToken(IDENTIFIER);
-*/
-//> keyword-type
             var text = source.Substring(start, current - start);
             var keyExists = keywords.ContainsKey(text);
             TokenType type;
             if (keyExists)
                 type = keywords[text];
-            else //keywords.Add(text, TokenType.IDENTIFIER);
+            else
                 type = TokenType.IDENTIFIER;
             AddToken(type);
-//< keyword-type
         }
 
-//< identifier
-//> number
+        // consumes as many digits of an integer as possible
         private void Number()
         {
             while (IsDigit(Peek())) Advance();
 
-            // Look for a fractional part.
+            // looks (and handles) if there's a decimal in the number
             if (Peek() == '.' && IsDigit(PeekNext()))
             {
-                // Consume the "."
                 Advance();
-
                 while (IsDigit(Peek())) Advance();
             }
 
@@ -227,8 +206,7 @@ namespace LoxInterpreter
                 double.Parse(source.Substring(start, current - start)));
         }
 
-//< number
-//> string
+        // consumes string until reaching the closing quote
         private void String()
         {
             while (Peek() != '"' && !IsAtEnd())
@@ -238,19 +216,15 @@ namespace LoxInterpreter
             }
 
             if (IsAtEnd())
-                //Lox.error(line, "Unterminated string.");
                 return;
 
-            // The closing ".
             Advance();
 
-            // Trim the surrounding quotes.
             var value = source.Substring(start + 1, current - start - 2);
             AddToken(TokenType.STRING, value);
         }
 
-//< string
-//> match
+        // similar to Advance(), but employs maximal munch
         private bool Match(char expected)
         {
             if (IsAtEnd()) return false;
@@ -260,24 +234,21 @@ namespace LoxInterpreter
             return true;
         }
 
-//< match
-//> peek
+        // similar to Advance() but doesn't consume the character (just looks ahead)
         private char Peek()
         {
             if (IsAtEnd()) return '\0';
             return source[current];
         }
 
-//< peek
-//> peek-next
+        // used for checking after the decimal in a number (you need to peek twice)
         private char PeekNext()
         {
             if (current + 1 >= source.Length) return '\0';
             return source[current + 1];
-        } // [peek-next]
+        }
 
-//< peek-next
-//> is-alpha
+        // checks if input is a character
         private bool IsAlpha(char c)
         {
             return c >= 'a' && c <= 'z' ||
@@ -285,42 +256,41 @@ namespace LoxInterpreter
                    c == '_';
         }
 
+        // checks if input is alphanumeric
         private bool IsAlphaNumeric(char c)
         {
             return IsAlpha(c) || IsDigit(c);
         }
 
-//< is-alpha
-//> is-digit
+        // checks if input is digit
         private bool IsDigit(char c)
         {
             return c >= '0' && c <= '9';
-        } // [is-digit]
+        }
 
-//< is-digit
-//> is-at-end
+        // checks if is at end of source
         private bool IsAtEnd()
         {
             return current >= source.Length;
         }
 
-//< is-at-end
-//> advance-and-add-token
+        // advances through source (consumes next character and returns it)
         private char Advance()
         {
             return source[current++];
         }
 
+        // creates a token for current text (token only)
         private void AddToken(TokenType type)
         {
             AddToken(type, null);
         }
 
+        // creates a token for current text (handles tokens with literal values)
         private void AddToken(TokenType type, object literal)
         {
             var text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
-//< advance-and-add-token
     }
 }

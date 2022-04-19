@@ -3,22 +3,28 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// implements Clock, a native function of lox
+    /// </summary>
     public class Clock : ILoxCallable
     {
-        //deleted override below
         public int Arity()
         {
             return 0;
         }
 
-        //deleted override below
+        /// <summary>
+        /// gets current time
+        /// </summary>
+        /// <param name="interpreter"></param>
+        /// <param name="arguments"></param>
+        /// <returns>time in milliseconds</returns>
         public object Call(Interpreter interpreter, List<object> arguments)
         {
             var millisec = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             return millisec / 1000.0;
         }
 
-        //deleted override below
         public override string ToString()
         {
             return "<native fn>";

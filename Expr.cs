@@ -20,8 +20,6 @@ namespace LoxInterpreter
 
             T VisitSetExpr(Set expr);
 
-            // T VisitSuperExpr(Super expr);
-            // T VisitThisExpr(This expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
@@ -184,42 +182,6 @@ namespace LoxInterpreter
                 return visitor.VisitSetExpr(this);
             }
         }
-
-        //< expr-set
-        //> expr-super
-        // public class Super : Expr
-        // {
-        //   public Super(Token keyword, Token method)
-        //   {
-        //     this.keyword = keyword;
-        //     this.method = method;
-        //   }
-        //
-        //   public override T Accept<T>(IVisitor<T> visitor)
-        //   {
-        //     return visitor.VisitSuperExpr(this);
-        //   }
-        //
-        //   public Token keyword;
-        //   public Token method;
-        // }
-
-        //< expr-super
-        //> expr-this
-        // public class This : Expr
-        // {
-        //   public This(Token keyword)
-        //   {
-        //     this.keyword = keyword;
-        //   }
-        //
-        //   public override T Accept<T>(IVisitor<T> visitor)
-        //   {
-        //     return visitor.VisitThisExpr(this);
-        //   }
-        //
-        //   public Token keyword;
-        // }
 
         //< expr-this
         //> expr-unary

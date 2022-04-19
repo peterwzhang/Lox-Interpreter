@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// reads tokens and parses them
+    /// </summary>
     public class Parser
     {
-        //< parse-error
         private readonly List<Token> tokens;
         private int current;
 
@@ -14,45 +16,28 @@ namespace LoxInterpreter
             this.tokens = tokens;
         }
 
-        //> Statements and State parse
+        // method that begins parsing tokens
         public List<Stmt> Parse()
         {
             var statements = new List<Stmt>();
             while (!IsAtEnd())
-                /* Statements and State parse < Statements and State parse-declaration
-                          statements.Add(statement());
-                    */
-                //> parse-declaration
                 statements.Add(Declaration());
-            //< parse-declaration
 
-            return statements; // [parse-error-handling]
+            return statements;
         }
 
-        //< Statements and State parse
-        //> expression
+        // expands to Assignment
         private Expr Expression()
         {
-            /* Parsing Expressions expression < Statements and State expression
-                return equality();
-            */
-            //> Statements and State expression
             return Assignment();
-            //< Statements and State expression
         }
 
-        //< expression
-        //> Statements and State declaration
+        // allows for variable declarations (parses variables)
         private Stmt Declaration()
         {
             try
             {
-                //> Classes match-class
-                //if (match(TokenType.CLASS)) return classDeclaration();
-                //< Classes match-class
-                //> Functions match-fun
                 if (Match(TokenType.FUN)) return Function("function");
-                //< Functions match-fun
                 if (Match(TokenType.VAR)) return VarDeclaration();
 
                 return Statement();
@@ -64,73 +49,25 @@ namespace LoxInterpreter
             }
         }
 
-        //< Statements and State declaration
-        //> Classes parse-class-declaration
-        // private Stmt classDeclaration()
-        // {
-        //     Token name = consume(TokenType.IDENTIFIER, "Expect class name.");
-        //     //> Inheritance parse-superclass
-        //
-        //     Expr.Variable superclass = null;
-        //     if (match(TokenType.LESS))
-        //     {
-        //         consume(TokenType.IDENTIFIER, "Expect superclass name.");
-        //         superclass = new Expr.Variable(previous());
-        //     }
-        //
-        //     //< Inheritance parse-superclass
-        //     consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
-        //
-        //     var methods = new List<Stmt.Function>();
-        //     while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
-        //     {
-        //         methods.Add(function("method"));
-        //     }
-        //
-        //     consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
-        //
-        //     /* Classes parse-class-declaration < Inheritance construct-class-ast
-        //         return new Stmt.Class(name, methods);
-        //     */
-        //     //> Inheritance construct-class-ast
-        //     return new Stmt.Class(name, superclass, methods);
-        //     //< Inheritance construct-class-ast
-        // }
-
-        //< Classes parse-class-declaration
-        //> Statements and State parse-statement
+        // parses statements
         private Stmt Statement()
         {
-            //> Control Flow match-for
             if (Match(TokenType.FOR)) return ForStatement();
-            //< Control Flow match-for
-            //> Control Flow match-if
             if (Match(TokenType.IF)) return IfStatement();
-            //< Control Flow match-if
             if (Match(TokenType.PRINT)) return PrintStatement();
-            //> Functions match-return
             if (Match(TokenType.RETURN)) return ReturnStatement();
-            //< Functions match-return
-            //> Control Flow match-while
             if (Match(TokenType.WHILE)) return WhileStatement();
-            //< Control Flow match-while
-            //> parse-block
             if (Match(TokenType.LEFT_BRACE)) return new Stmt.Block(Block());
-            //< parse-block
 
             return ExpressionStatement();
         }
 
-        //< Statements and State parse-statement
-        //> Control Flow for-statement
+        // parses for loop
         private Stmt ForStatement()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
 
-            /* Control Flow for-statement < Control Flow for-initializer
-                // More here...
-            */
-            //> for-initializer
+            // initializer for for loop
             Stmt initializer;
             if (Match(TokenType.SEMICOLON))
                 initializer = null;
@@ -138,25 +75,21 @@ namespace LoxInterpreter
                 initializer = VarDeclaration();
             else
                 initializer = ExpressionStatement();
-            //< for-initializer
-            //> for-condition
 
+            // sets condition to null
             Expr condition = null;
             if (!Check(TokenType.SEMICOLON)) condition = Expression();
 
             Consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
-            //< for-condition
-            //> for-increment
 
+            // increments index
             Expr increment = null;
             if (!Check(TokenType.RIGHT_PAREN)) increment = Expression();
 
+            // body of for loop
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
-            //< for-increment
-            //> for-body
             var body = Statement();
 
-            //> for-desugar-increment
             if (increment != null)
             {
                 var tmp = new List<Stmt>
@@ -167,13 +100,11 @@ namespace LoxInterpreter
                 body = new Stmt.Block(tmp);
             }
 
-            //< for-desugar-increment
-            //> for-desugar-condition
+            // checks condition
             if (condition == null) condition = new Expr.Literal(true);
             body = new Stmt.While(condition, body);
 
-            //< for-desugar-condition
-            //> for-desugar-initializer
+            // checks initializer
             if (initializer != null)
             {
                 var tmp = new List<Stmt>
@@ -184,19 +115,16 @@ namespace LoxInterpreter
                 body = new Stmt.Block(tmp);
             }
 
-            //< for-desugar-initializer
             return body;
-            //< for-body
         }
 
-        //< Control Flow for-statement
-        //> Control Flow if-statement
+        // parses if statements
         private Stmt IfStatement()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
             var condition = Expression();
-            Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition."); // [parens]
-
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition."); 
+            
             var thenBranch = Statement();
             Stmt elseBranch = null;
             if (Match(TokenType.ELSE)) elseBranch = Statement();
@@ -204,8 +132,7 @@ namespace LoxInterpreter
             return new Stmt.If(condition, thenBranch, elseBranch);
         }
 
-        //< Control Flow if-statement
-        //> Statements and State parse-print-statement
+        // match and consume print token
         private Stmt PrintStatement()
         {
             var value = Expression();
@@ -213,8 +140,7 @@ namespace LoxInterpreter
             return new Stmt.Print(value);
         }
 
-        //< Statements and State parse-print-statement
-        //> Functions parse-return-statement
+        // parses return statement from function
         private Stmt ReturnStatement()
         {
             var keyword = Previous();
@@ -225,8 +151,6 @@ namespace LoxInterpreter
             return new Stmt.Return(keyword, value);
         }
 
-        //< Functions parse-return-statement
-        //> Statements and State parse-var-declaration
         private Stmt VarDeclaration()
         {
             var name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
@@ -238,8 +162,7 @@ namespace LoxInterpreter
             return new Stmt.Var(name, initializer);
         }
 
-        //< Statements and State parse-var-declaration
-        //> Control Flow while-statement
+        // parses while statement
         private Stmt WhileStatement()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
@@ -250,8 +173,7 @@ namespace LoxInterpreter
             return new Stmt.While(condition, body);
         }
 
-        //< Control Flow while-statement
-        //> Statements and State parse-expression-statement
+        // parses and consumes an expression
         private Stmt ExpressionStatement()
         {
             var expr = Expression();
@@ -259,38 +181,29 @@ namespace LoxInterpreter
             return new Stmt.Expression(expr);
         }
 
-        //< Statements and State parse-expression-statement
-        //> Functions parse-function
+        // parses functions
         private Stmt.Function Function(string kind)
         {
             var name = Consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
-            //> parse-parameters
+            // parses parameter list and parentheses
             Consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
             var parameters = new List<Token>();
             if (!Check(TokenType.RIGHT_PAREN))
                 do
                 {
-                    // if (parameters.size() >= 255)
-                    // {
-                    //     //error(peek(), "Can't have more than 255 parameters.");
-                    // }
-
                     parameters.Add(
                         Consume(TokenType.IDENTIFIER, "Expect parameter name."));
                 } while (Match(TokenType.COMMA));
 
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
-            //< parse-parameters
-            //> parse-body
 
+            // parses body and wraps it in function node
             Consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
             var body = Block();
             return new Stmt.Function(name, parameters, body);
-            //< parse-body
         }
 
-        //< Functions parse-function
-        //> Statements and State block
+        // create empty list, parse statements and add them to the list as they are parsed
         private List<Stmt> Block()
         {
             var statements = new List<Stmt>();
@@ -301,19 +214,14 @@ namespace LoxInterpreter
             return statements;
         }
 
-        //< Statements and State block
-        //> Statements and State parse-assignment
+        // parses an assignment expression
         private Expr Assignment()
         {
-            /* Statements and State parse-assignment < Control Flow or-in-assignment
-                Expr expr = equality();
-            */
-            //> Control Flow or-in-assignment
             var expr = Or();
-            //< Control Flow or-in-assignment
 
             if (Match(TokenType.EQUAL))
             {
+                // recursively calls Assignment() on right hand side
                 var equals = Previous(); //TODO: this is not used
                 var value = Assignment();
 
@@ -321,28 +229,24 @@ namespace LoxInterpreter
                 {
                     var name = ((Expr.Variable) expr).name;
                     return new Expr.Assign(name, value);
-                    //> Classes assign-set
                 }
 
                 if (expr is Expr.Get)
                 {
                     var get = (Expr.Get) expr;
                     return new Expr.Set(get.obj, get.name, value);
-                    //< Classes assign-set
                 }
 
-                //error(equals, "Invalid assignment target."); // [no-throw]
             }
-
             return expr;
         }
 
-        //< Statements and State parse-assignment
-        //> Control Flow or
+        // parses or expression
         private Expr Or()
         {
             var expr = And();
 
+            // if one of the values is true
             while (Match(TokenType.OR))
             {
                 var op = Previous();
@@ -353,8 +257,7 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< Control Flow or
-        //> Control Flow and
+        // parses and expression
         private Expr And()
         {
             var expr = Equality();
@@ -369,12 +272,12 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< Control Flow and
-        //> equality
+        // checks for equality
         private Expr Equality()
         {
             var expr = Comparison();
 
+            // checks if != or ==
             while (Match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL))
             {
                 var op = Previous();
@@ -385,8 +288,6 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< equality
-        //> comparison
         private Expr Comparison()
         {
             var expr = Term();
@@ -401,8 +302,7 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< comparison
-        //> term
+        // parses binary operator for addition and subtraction
         private Expr Term()
         {
             var expr = Factor();
@@ -417,8 +317,7 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< term
-        //> factor
+        // parses binary operator for multiplication and division
         private Expr Factor()
         {
             var expr = Unary();
@@ -433,10 +332,10 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< factor
-        //> unary
+        // parses unary expression
         private Expr Unary()
         {
+            // recursively call Unary() to parse operation if current token is ! or -
             if (Match(TokenType.BANG, TokenType.MINUS))
             {
                 var op = Previous();
@@ -444,29 +343,17 @@ namespace LoxInterpreter
                 return new Expr.Unary(op, right);
             }
 
-            /* Parsing Expressions unary < Functions unary-call
-                return primary();
-            */
-            //> Functions unary-call
+            // otherwise, return primary expression (inside Call())
             return Call();
-            //< Functions unary-call
         }
 
-        //< unary
-        //> Functions finish-call
+        // parses the argument list
         private Expr FinishCall(Expr callee)
         {
             var arguments = new List<Expr>();
             if (!Check(TokenType.RIGHT_PAREN))
                 do
                 {
-                    //> check-max-arity
-                    // if (arguments.size() >= 255)
-                    // {
-                    //     error(peek(), "Can't have more than 255 arguments.");
-                    // }
-
-                    //< check-max-arity
                     arguments.Add(Expression());
                 } while (Match(TokenType.COMMA));
 
@@ -476,25 +363,22 @@ namespace LoxInterpreter
             return new Expr.Call(callee, paren, arguments);
         }
 
-        //< Functions finish-call
-        //> Functions call
+        // parses function calls
         public Expr Call()
         {
+            // parses primary expressions
             var expr = Primary();
 
             while (true)
-                // [while-true]
                 if (Match(TokenType.LEFT_PAREN))
                 {
                     expr = FinishCall(expr);
-                    //> Classes parse-property
                 }
                 else if (Match(TokenType.DOT))
                 {
                     var name = Consume(TokenType.IDENTIFIER,
                         "Expect property name after '.'.");
                     expr = new Expr.Get(expr, name);
-                    //< Classes parse-property
                 }
                 else
                 {
@@ -504,53 +388,37 @@ namespace LoxInterpreter
             return expr;
         }
 
-        //< Functions call
-        //> primary
+        // parses primary expression
         private Expr Primary()
         {
+            // if expression is true, false, or null
             if (Match(TokenType.FALSE)) return new Expr.Literal(false);
             if (Match(TokenType.TRUE)) return new Expr.Literal(true);
             if (Match(TokenType.NIL)) return new Expr.Literal(null);
 
+            // is expression is a number or a string
             if (Match(TokenType.NUMBER, TokenType.STRING)) return new Expr.Literal(Previous().literal);
-            //> Inheritance parse-super
 
-            // if (match(TokenType.SUPER))
-            // {
-            //     Token keyword = previous();
-            //     consume(TokenType.DOT, "Expect '.' after 'super'.");
-            //     Token method = consume(TokenType.IDENTIFIER,
-            //         "Expect superclass method name.");
-            //     return new Expr.Super(keyword, method);
-            // }
-            // //< Inheritance parse-super
-            // //> Classes parse-this
-            //
-            // if (match(TokenType.THIS)) return new Expr.This(previous());
-
-            //< Classes parse-this
-            //> Statements and State parse-identifier
-
+            // if expression is an identifier
             if (Match(TokenType.IDENTIFIER)) return new Expr.Variable(Previous());
-            //< Statements and State parse-identifier
 
+            // if expression is a left parenthesis (end of expression)
             if (Match(TokenType.LEFT_PAREN))
             {
                 var expr = Expression();
                 Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
-            //> primary-error
-
-            //throw error(peek(), "Expect expression.");
-            //< primary-error
-
-            //won't get here! it's ok!
+            
+            // won't get here! it's ok!
             return new Expr.Grouping(Expression());
         }
 
-        //< primary
-        //> match
+        /// <summary>
+        /// checks if the token is of any the types in TokenTypes, consumes the token
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns>boolean of whether the given token is of a certain type</returns>
         private bool Match(params TokenType[] types)
         {
             foreach (var type in types)
@@ -563,60 +431,52 @@ namespace LoxInterpreter
             return false;
         }
 
-        //< match
-        //> consume
+        // checks if token is of desired type
+        // if true, consumes token and continues
         private Token Consume(TokenType type, string message) //TODO: message is not used
         {
             if (Check(type)) return Advance();
             //TODO: is this right
             return Advance();
-
-            //throw error(peek(), message);
         }
 
-        //< consume
-        //> check
+        /// <summary>
+        /// like Match() but doesn't consume the token
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>returns boolean of if a token is of a certain type</returns>
         private bool Check(TokenType type)
         {
             if (IsAtEnd()) return false;
             return Peek().type == type;
         }
 
-        //< check
-        //> advance
+        // consumes current token and returns it (similar to Advance() in Scanner.cs)
         private Token Advance()
         {
             if (!IsAtEnd()) current++;
             return Previous();
         }
 
-        //< advance
-        //> utils
+        // checks if at end of token list
         private bool IsAtEnd()
         {
             return Peek().type == TokenType.EOF;
         }
 
+        // looks at next token (doesn't consume)
         private Token Peek()
         {
             return tokens[current];
         }
 
+        // returns most recently consumed token
         private Token Previous()
         {
             return tokens[current - 1];
         }
 
-        //< utils
-        //> error
-        // private ParseError error(Token token, string message)
-        // {
-        //     Lox.error(token, message);
-        //     return new ParseError();
-        //}
-
-        //< error
-        //> synchronize
+        // discards tokens until reaches statement boundary
         private void Synchronize()
         {
             Advance();
@@ -627,7 +487,6 @@ namespace LoxInterpreter
 
                 switch (Peek().type)
                 {
-                    case TokenType.CLASS:
                     case TokenType.FUN:
                     case TokenType.VAR:
                     case TokenType.FOR:
@@ -642,5 +501,4 @@ namespace LoxInterpreter
             }
         }
     }
-    //< synchronize
 }

@@ -1,5 +1,8 @@
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// categories of tokens taken from input
+    /// </summary>
     public enum TokenType
     {
         // Single-character tokens.

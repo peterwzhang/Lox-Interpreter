@@ -2,16 +2,17 @@ using System.Collections.Generic;
 
 namespace LoxInterpreter
 {
+    /// <summary>
+    /// statement class that holds all types of statements
+    /// </summary>
     public abstract class Stmt
     {
-//< stmt-while
         public abstract T Accept<T>(IVisitor<T> visitor);
 
+        // IVisitor interface with all relevant statement types
         public interface IVisitor<T>
         {
             T VisitBlockStmt(Block stmt);
-
-            //T VisitClassStmt(Class stmt);
             T VisitExpressionStmt(Expression stmt);
             T VisitFunctionStmt(Function stmt);
             T VisitIfStmt(If stmt);
@@ -21,8 +22,7 @@ namespace LoxInterpreter
             T VisitWhileStmt(While stmt);
         }
 
-        // Nested Stmt classes here...
-//> stmt-block
+        // calls IVisit interface on given block statements
         public class Block : Stmt
         {
             public List<Stmt> statements;
@@ -38,32 +38,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-block
-//> stmt-class
-        // public class Class : Stmt
-        // {
-        //
-        //   public Token name;
-        //   public Expr.Variable superclass;
-        //   public List<Stmt.Function> methods;
-        //
-        //   public Class(Token name,
-        //     Expr.Variable superclass,
-        //     List<Stmt.Function> methods)
-        //   {
-        //     this.name = name;
-        //     this.superclass = superclass;
-        //     this.methods = methods;
-        //   }
-        //
-        //   public override T Accept<T>(IVisitor visitor)
-        //   {
-        //     return visitor.VisitClassStmt(this);
-        //   }
-        // }
-
-//< stmt-class
-//> stmt-expression
+        // calls IVisit interface on given expressions
         public class Expression : Stmt
         {
             public Expr expression;
@@ -79,8 +54,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-expression
-//> stmt-function
+        // calls IVisit interface on given functions
         public class Function : Stmt
         {
             public List<Stmt> body;
@@ -102,8 +76,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-function
-//> stmt-if
+        // calls IVisit interface on given if statements
         public class If : Stmt
         {
             public Expr condition;
@@ -123,8 +96,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-if
-//> stmt-print
+        // calls IVisit interface on given print statements
         public class Print : Stmt
         {
             public Expr expression;
@@ -140,8 +112,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-print
-//> stmt-return
+        // calls IVisit interface on given return statements
         public class Return : Stmt
         {
             public readonly Token keyword;
@@ -159,8 +130,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-return
-//> stmt-var
+        // calls IVisit interface on given variables
         public class Var : Stmt
         {
             public Expr initializer;
@@ -180,8 +150,7 @@ namespace LoxInterpreter
             }
         }
 
-//< stmt-var
-//> stmt-while
+        // calls IVisit interface on given while statements
         public class While : Stmt
         {
             public Stmt body;
@@ -202,4 +171,3 @@ namespace LoxInterpreter
         }
     }
 }
-//< Appendix II stmt
