@@ -1,6 +1,6 @@
 #! /bin/sh
 
-numTests=25 # UPDATE THIS TO THE NUMBER OF TESTS
+numTests=17 # UPDATE THIS TO THE NUMBER OF TESTS
 sucesses=0
 
 getInput() {
@@ -10,8 +10,11 @@ getInput() {
 
 runTest() {
     echo "Running test case $1"
-    ./tester/kamincpp < tester/tests/test"$1".lisp > tester/tests/test"$1".out
-    python3 src/project1.py < tester/tests/test"$1".lisp > tester/tests/test"$1".ans
+    # java -cp ../../.. com.craftinginterpreters.lox.Lox < tester/tests/test"$1".lox > tester/tests/test"$1".out # if in tester directory
+    java -cp ./tester/build/java com.craftinginterpreters.lox.Lox tester/tests/test"$1".lox > tester/tests/test"$1".out
+    # ./tester/kamincpp < tester/tests/test"$1".lisp > tester/tests/test"$1".out
+    # python3 src/project1.py < tester/tests/test"$1".lisp > tester/tests/test"$1".ans
+    mono ./bin/Debug/LoxInterpreter.exe tester/tests/test"$1".lox > tester/tests/test"$1".ans
     matchedLines=$(diff -w -y --suppress-common-lines "tester/tests/test$1.ans" "tester/tests/test$1.out" | wc -l | tr -d '[:space:]')
     if [ "$matchedLines" -eq "0" ]; then
         echo "Test case $1 passed"
@@ -33,12 +36,22 @@ test() {
     echo "Number of tests passed: $sucesses/$numTests"
 }
 
-makeKamin() {
+makeLox() {
+    msbuild LoxInterpreter.csproj
+}
+
+makeJLox() {
     cd tester || return
-    make
+    make jlox
     cd ..
 }
 
+cleanTests() {
+    rm -rf tester/tests/*.out
+    rm -rf tester/tests/*.ans
+}
+
 getInput
-makeKamin
+makeLox
+makeJLox
 test "$num"
