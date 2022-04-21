@@ -51,6 +51,7 @@ cleanTests() {
     rm -rf tester/tests/*.ans
 }
 
+cleanTests
 getInput
 makeLox
 makeJLox
