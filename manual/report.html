@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>Spring 2022 | JLox Interpreter Project</title>
+    <title>Spring 2022 | Lox Interpreter Project</title>
 
     <link href="./report.css" rel="stylesheet" />
     <script async src="/cdn-cgi/bm/cv/669835187/api.js"></script>
@@ -168,6 +168,8 @@
                         <li>Using "readonly" for immutable variables in place of "final"</li>
                         <li>Using namespaces in place of packages</li>
                         <li>Using "foreach" loops</li>
+                        <li>Using "var" for implicit typing rather than explicit when one can easily derive the type
+                            from RHS.</li>
                     </ul>
                     </p>
                     <h4>Implementation of Code</h4>
@@ -256,15 +258,6 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <strong>Fix Tim Budd's C++ Kamin Lisp Interpreter</strong>
-                                </td>
-
-                                <td>15.00%</td>
-                                <td>15.00%</td>
-                                <td>70.00%</td>
-                            </tr>
-                            <tr>
-                                <td>
                                     <strong>Testing Script</strong>
                                 </td>
 
@@ -289,34 +282,16 @@
                 <div class="divider"></div>
 
                 <div class="section">
-                    <h4>Fix Tim Budd's C++ Kamin Lisp Interpreter</h4>
-                    <p>
-                        We wanted something to compare our test outputs to. Kamin
-                        references Tim Budd's C++ version of the Kamin interpreters
-                        <a href="https://kamin.cs.illinois.edu/pubs.html">here</a> and the
-                        download for Tim Budd's code can be found
-                        <a
-                            href="https://www.cs.cmu.edu/afs/cs/project/ai-repository/ai/lang/lisp/impl/kamin/budd/0.html">here</a>
-                        on the CMU AI repository. Since Tim Budd's C++ implementation was
-                        made in 1994 it did not work with a modern compiler, we had to
-                        manually update each file to compile. This involved renaming true
-                        and false, fixing imports, replacing gets with fgets, and other
-                        small changes. Once the program was able to compile, we used the
-                        program to aid our development and testing.
-                    </p>
-                </div>
-                <div class="section">
                     <h4>Testing Script</h4>
                     <div style="float: left">
                         <p>
                             We used a bash script to help automate our tests. The bash
                             script is named "tester.sh" and it is located in the main
                             directory. It is hardcoded to specifically work with our project
-                            directory. We updated a 1994 C++ version of Kamin's Lisp
-                            Interpreter to work with a modern day C++ compiler. The testing
+                            directory. We got the JLox source code from the craftinginterpreters Github. The testing
                             script ask to run either a specified single test case or all of
-                            the test cases. It will then compile Kamin's Lisp Interpreter.
-                            Then the tester will then run the test case(s) on the C++ Kamin
+                            the test cases. It will then compile our C# Lox Interpreter then compile the JLox Interpreter.
+                            Then the tester will then run the test case(s) on the JLox
                             Interpreter and our own interpreter and compare the outputs. If
                             the resulting outputs are the same then the test passes.
                         </p>
@@ -324,8 +299,7 @@
                             Below, to the right you can see the output of our tester when we
                             ran it. To the left there is a list of our test cases. You can
                             view each test case individually along with the output of our
-                            interpreter (the output is the same as Tim Budd's version of
-                            Kamin's Lisp Interpreter).
+                            interpreter (the output is the same as the JLox Interpreter.
                         </p>
                     </div>
                     <div style="float: right">
