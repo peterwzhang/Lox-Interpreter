@@ -74,8 +74,9 @@ for (cf = 0; cf < 5; cf = cf + 1) {                            //for
 }
 print cf == 5;
 
-print "         Testing precedence...";              //11- precedence- * has higher precedence than +.      From https://github.com/munificent/craftinginterpreters
-var x;
+print "         Testing precedence...";              //11- precedence- * has higher precedence than +.      
+var x;                                               //    From https://github.com/munificent/craftinginterpreters
+var x;                                               
 x = 2 + 3 * 4; // expect: 14
 print x == 14;
 // * has higher precedence than -.
@@ -96,14 +97,14 @@ print false == 2 <= 1; // expect: true
 // >= has higher precedence than ==.
 print false == 1 >= 2; // expect: true
 
-print "         Testing 1-1 space sensitivity...";   //12-  1 - 1 is not space-sensitive.                 From https://github.com/munificent/craftinginterpreters
-print 0 == 1 - 1; 
+print "         Testing 1-1 space sensitivity...";   //12- 1 - 1 is not space-sensitive.        
+print 0 == 1 - 1;                                    //    From https://github.com/munificent/craftinginterpreters
 print 0 == 1 -1;  
 print 0 == 1- 1; 
 print 0 == 1-1;   
 
 print "         Testing basic functions...";         //13- basic functions
-fun double(a){
+fun double(a){                                
     return a * 2;
 }
 fun median(a, b, c) {
@@ -134,8 +135,8 @@ print dec(0) == 0;
 print dec(5) == 0;
 print factorial(3) == 6; //3! = 6
 
-print "         Testing first-class-ness of function...";    //15- first-class-ness of function               From https://github.com/munificent/craftinginterpreters
-fun addPair(a, b) {
+print "         Testing first-class-ness of function...";    //15- first-class-ness of function      
+fun addPair(a, b) {                                          //    From https://github.com/munificent/craftinginterpreters
   return a + b;
 }
 fun identity(a) {
@@ -143,8 +144,8 @@ fun identity(a) {
 }
 print identity(addPair)(1, 2) == 3;    
 
-print "         Testing function's local function...";       //16- local function of function                 From https://github.com/munificent/craftinginterpreters
-fun outerFunction(x) {  
+print "         Testing function's local function...";       //16- local function of function 
+fun outerFunction(x) {                                       //    From https://github.com/munificent/craftinginterpreters
   fun localFunction() {
     return x + 1;
   }
@@ -152,8 +153,8 @@ fun outerFunction(x) {
 }
 print outerFunction(0) == 1;
 
-print "         Testing crazy closure function...";          //17- crazy closure function                     From https://github.com/munificent/craftinginterpreters
-fun returnFunction() {
+print "         Testing crazy closure function...";          //17- crazy closure function 
+fun returnFunction() {                                       //    From https://github.com/munificent/craftinginterpreters
   var o = "outside";
 
   fun inner() {

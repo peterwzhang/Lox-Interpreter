@@ -1,4 +1,4 @@
-//closures
+//first-class-ness of functions
 fun addPair(a, b) {
   return a + b;
 }
