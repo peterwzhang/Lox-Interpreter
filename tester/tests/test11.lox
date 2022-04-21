@@ -1,4 +1,4 @@
-// precedence- * has higher precedence than +.      From https://github.com/munificent/craftinginterpreters
+// precedence- * has higher precedence than +.             From https://github.com/munificent/craftinginterpreters
 print "         Testing precedence...";
 var x;
 x = 2 + 3 * 4; // expect: 14
