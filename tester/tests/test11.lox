@@ -1,5 +1,4 @@
-//From https://github.com/munificent/craftinginterpreters
-// * has higher precedence than +.
+// precedence- * has higher precedence than +.      From https://github.com/munificent/craftinginterpreters
 var x;
 x = 2 + 3 * 4; // expect: 14
 print x == 14;
@@ -13,6 +12,17 @@ x = 12 + 6 / 3; // expect: 14
 print x == 14;
 
 // / has higher precedence than -.
-x 16 - 6 / 3; // expect: 14
+x = 16 - 6 / 3; // expect: 14
 print x == 14;
 
+// < has higher precedence than ==.
+print false == 2 < 1; // expect: true
+
+// > has higher precedence than ==.
+print false == 1 > 2; // expect: true
+
+// <= has higher precedence than ==.
+print false == 2 <= 1; // expect: true
+
+// >= has higher precedence than ==.
+print false == 1 >= 2; // expect: true

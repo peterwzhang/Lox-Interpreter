@@ -5,3 +5,12 @@ fun dec(x) {
     } else 
         return dec(x-1);
 }
+fun factorial(x)
+{
+    if (x == 0)
+        return 1;
+    return x * factorial(x - 1);
+}
+print dec(0) == 0;
+print dec(5) == 0;
+print factorial(3) == 6; //3! = 6

@@ -1,8 +1,9 @@
-//local function of function         From https://github.com/munificent/craftinginterpreters
-fun outerFunction(x) {                                    
+//local function of function
+fun outerFunction(x) {
   fun localFunction() {
-    return x + 1;
+    x = x + 1;
   }
-  return localFunction();
+
+  localFunction();
 }
 print outerFunction(0) == 1;

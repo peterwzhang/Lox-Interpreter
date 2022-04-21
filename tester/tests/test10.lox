@@ -1,6 +1,6 @@
 //control flow
 var cf = 0;
-if (nil) {
+if (nil) {                              //if else
   cf;
 } else {
   cf = cf + 1;
@@ -8,12 +8,12 @@ if (nil) {
 print cf == 1;
 
 cf = 0;
-while (a <= 10) {
+while (a <= 10) {                       //while
   cf = cf + 1;
 }
 print cf == 10;
 
-for (cf = 0; cf < 10; cf = cf + 1) {
+for (cf = 0; cf < 10; cf = cf + 1) {    //for
   cf;
 }
 print cf == 9;

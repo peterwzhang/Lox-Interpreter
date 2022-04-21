@@ -1,5 +1,5 @@
-//crazy closure function         From https://github.com/munificent/craftinginterpreters
-fun returnFunction() {                                      
+//crazy closure function
+fun returnFunction() {
   var o = "outside";
 
   fun inner() {

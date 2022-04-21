@@ -1,8 +1,8 @@
-//first-class-ness of function            From https://github.com/munificent/craftinginterpreters
-fun addPair(a, b) {                                          
+//first-class-ness of functions
+fun addPair(a, b) {
   return a + b;
 }
 fun identity(a) {
   return a;
 }
-print identity(addPair)(1, 2) == 3;   
+print identity(addPair)(1, 2) == 3; 
