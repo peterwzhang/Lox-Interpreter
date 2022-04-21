@@ -1,0 +1,12 @@
+//crazy closure function         From https://github.com/munificent/craftinginterpreters
+fun returnFunction() {                                      
+  var o = "outside";
+
+  fun inner() {
+    return o;
+  }
+
+  return inner;
+}
+var fn = returnFunction();
+print fn() == "outside";

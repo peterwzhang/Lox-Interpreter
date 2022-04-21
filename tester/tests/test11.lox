@@ -13,6 +13,6 @@ x = 12 + 6 / 3; // expect: 14
 print x == 14;
 
 // / has higher precedence than -.
-x = 16 - 6 / 3; // expect: 14
+x 16 - 6 / 3; // expect: 14
 print x == 14;
 
